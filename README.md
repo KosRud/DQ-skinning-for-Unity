@@ -3,7 +3,7 @@
 ### Features:
 * **GPU** skinning with compute shaders (only)
 * **blend shape** support (calculations performed in compute shader)
-* works with **any platform that supports compute shaders**, not just Dx11
+* works with **any platform that supports compute shaders**
 * **preserves volume** with deformation (look comparison)
 * **zero GC allocations** per frame
 
