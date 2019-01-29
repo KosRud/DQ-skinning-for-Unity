@@ -1,19 +1,19 @@
 # Dual quaternion skinning for Unity3D
 
-### features:
+### Features:
 * **GPU** skinning with compute shaders (only)
 * **blend shape** support (calculations performed in compute shader)
 * works with **any platform that supports compute shaders**, not just Dx11
 * **preserves volume** with deformation (look comparison)
 
-### comparison:
+### Comparison:
 
 |Gif|Difference|
 |----|----|
 |<img src="Screenshots/before-after.gif">|<img src="Screenshots/diff.png">|
 
 
-### warning
+### Warning:
 You will not see any effect in edit mode. The scipt only works in play mode. If you see no effect in play mode verify that you are using the right shader.
 
 ### Performance:
