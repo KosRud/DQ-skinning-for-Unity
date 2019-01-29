@@ -80,7 +80,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 	{
 		float[] weights = new float[this.morphWeights.Length];
 		for (int i = 0; i < weights.Length; i++)
-			weights[i] = this.morphWeights[i] * 100;
+			weights[i] = this.morphWeights[i] * 100f;
 		return weights;
 	}
 
@@ -108,7 +108,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		if (index < 0 || index >= this.morphWeights.Length)
 			throw new System.IndexOutOfRangeException("Blend shape index out of range");
 
-		this.morphWeights[index] = value/100;
+		this.morphWeights[index] = value / 100f;
 	}
 
 	public float GetBlendShapeWeight(int index)
@@ -119,7 +119,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		if (index < 0 || index >= this.morphWeights.Length)
 			throw new System.IndexOutOfRangeException("Blend shape index out of range");
 
-		return this.morphWeights[index]*100;
+		return this.morphWeights[index] * 100f;
 	}
 
 	public Mesh mesh
