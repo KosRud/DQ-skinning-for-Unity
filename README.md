@@ -5,6 +5,7 @@
 * **blend shape** support (calculations performed in compute shader)
 * works with **any platform that supports compute shaders**, not just Dx11
 * **preserves volume** with deformation (look comparison)
+* **zero GC allocations** per frame
 
 ### Comparison:
 
