@@ -1,0 +1,120 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+#include "DQ.cginc"
+
+struct bone_weight_info
+{
+	int4 bone_indexes;
+	float4 bone_weights;
+};
+
+bool _OnlyRotation;
+
+RWStructuredBuffer<dual_quaternion> skinned_dual_quaternions;
+RWStructuredBuffer<bone_weight_info> bone_weights;
+RWStructuredBuffer<float3> original_vertices;
+RWStructuredBuffer<float3> original_normals;
+RWStructuredBuffer<float3> original_tangents;
+
+uint textureWidth;
+RWTexture2D<float4> skinned_data_1;
+RWTexture2D<float4> skinned_data_2;
+RWTexture2D<float> skinned_data_3;
+
+
+
+float3 SkinVertex(float3 original_vector, int index)
+{
+	float4 vertexPos = 0;
+	vertexPos.xyz = original_vector;
+
+	float4 boneIndexes = bone_weights.Load(index).bone_indexes;
+	float4 boneWeights = bone_weights.Load(index).bone_weights;
+
+	struct dual_quaternion dq0 = skinned_dual_quaternions.Load(boneIndexes[0]);
+	struct dual_quaternion dq1= skinned_dual_quaternions.Load(boneIndexes[1]);
+	struct dual_quaternion dq2 = skinned_dual_quaternions.Load(boneIndexes[2]);
+	struct dual_quaternion dq3 = skinned_dual_quaternions.Load(boneIndexes[3]);
+
+	dq1 = DualQuaternionShortestPath(dq1, dq0);
+	dq2 = DualQuaternionShortestPath(dq2, dq0);
+	dq3 = DualQuaternionShortestPath(dq3, dq0);
+
+	struct dual_quaternion skinned_dq;
+	skinned_dq.rotation_quaternion =	dq0.rotation_quaternion * boneWeights[0];
+	skinned_dq.rotation_quaternion +=	dq1.rotation_quaternion * boneWeights[1];
+	skinned_dq.rotation_quaternion +=	dq2.rotation_quaternion * boneWeights[2];
+	skinned_dq.rotation_quaternion +=	dq3.rotation_quaternion * boneWeights[3];
+
+	skinned_dq.translation_quaternion =		dq0.translation_quaternion * boneWeights[0];
+	skinned_dq.translation_quaternion +=	dq1.translation_quaternion * boneWeights[1];
+	skinned_dq.translation_quaternion +=	dq2.translation_quaternion * boneWeights[2];
+	skinned_dq.translation_quaternion +=	dq3.translation_quaternion * boneWeights[3];
+
+	float mag = length(skinned_dq.rotation_quaternion);
+	skinned_dq.rotation_quaternion		/= mag;
+	skinned_dq.translation_quaternion	/= mag;
+
+	vertexPos = QuaternionMultiply(skinned_dq.rotation_quaternion, vertexPos);
+	vertexPos = QuaternionMultiply(vertexPos, QuaternionInvert(skinned_dq.rotation_quaternion));
+
+	vertexPos += QuaternionMultiply(skinned_dq.translation_quaternion * 2, QuaternionInvert(skinned_dq.rotation_quaternion));
+
+	return vertexPos.xyz;
+}
+
+float3 SkinNormal(float3 original_vector, int index)
+{
+	float4 vertexPos = 0;
+	vertexPos.xyz = original_vector;
+
+	float4 boneIndexes = bone_weights.Load(index).bone_indexes;
+	float4 boneWeights = bone_weights.Load(index).bone_weights;
+
+	struct dual_quaternion dq0 = skinned_dual_quaternions.Load(boneIndexes[0]);
+	struct dual_quaternion dq1 = skinned_dual_quaternions.Load(boneIndexes[1]);
+	struct dual_quaternion dq2 = skinned_dual_quaternions.Load(boneIndexes[2]);
+	struct dual_quaternion dq3 = skinned_dual_quaternions.Load(boneIndexes[3]);
+
+	dq1 = DualQuaternionShortestPath(dq1, dq0);
+	dq2 = DualQuaternionShortestPath(dq2, dq0);
+	dq3 = DualQuaternionShortestPath(dq3, dq0);
+
+	struct dual_quaternion skinned_dq;
+	skinned_dq.rotation_quaternion = dq0.rotation_quaternion * boneWeights[0];
+	skinned_dq.rotation_quaternion += dq1.rotation_quaternion * boneWeights[1];
+	skinned_dq.rotation_quaternion += dq2.rotation_quaternion * boneWeights[2];
+	skinned_dq.rotation_quaternion += dq3.rotation_quaternion * boneWeights[3];
+
+	skinned_dq.translation_quaternion = dq0.translation_quaternion * boneWeights[0];
+	skinned_dq.translation_quaternion += dq1.translation_quaternion * boneWeights[1];
+	skinned_dq.translation_quaternion += dq2.translation_quaternion * boneWeights[2];
+	skinned_dq.translation_quaternion += dq3.translation_quaternion * boneWeights[3];
+
+	float mag = length(skinned_dq.rotation_quaternion);
+	skinned_dq.rotation_quaternion /= mag;
+	skinned_dq.translation_quaternion /= mag;
+
+	vertexPos = QuaternionMultiply(skinned_dq.rotation_quaternion, vertexPos);
+	vertexPos = QuaternionMultiply(vertexPos, QuaternionInvert(skinned_dq.rotation_quaternion));
+
+	return normalize(vertexPos.xyz);
+}
+
+[numthreads(1024,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	int2 pos;
+
+	pos.x = id.x % textureWidth;
+	pos.y = id.x / textureWidth;
+
+	float3 vertex = SkinVertex(original_vertices.Load(id.x), id.x);
+	float3 normal = SkinNormal(original_normals.Load(id.x), id.x);
+	float3 tangent = original_tangents.Load(id.x);
+
+	skinned_data_1[pos] = float4(vertex.xyz, normal.x);
+	skinned_data_2[pos] = float4(normal.yz,vertex.xy);
+	skinned_data_3[pos] = tangent.z;
+}
