@@ -30,7 +30,7 @@ public class DualQuaternionSkinnedEditor : Editor
 
 		EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField("DQ skinning: ", GUILayout.Width(80));
-			EditorGUILayout.LabelField(dqs.awakened ? "ON" : "OFF", GUILayout.Width(80));
+			EditorGUILayout.LabelField(dqs.started ? "ON" : "OFF", GUILayout.Width(80));
 		EditorGUILayout.EndHorizontal();
 
 		EditorGUILayout.Space();
@@ -42,7 +42,7 @@ public class DualQuaternionSkinnedEditor : Editor
 
 		if (this.showBlendShapes)
 		{
-			if (dqs.awakened == false)
+			if (dqs.started == false)
 			{
 				EditorGUI.BeginChangeCheck();
 				Undo.RecordObject(dqs.gameObject.GetComponent<SkinnedMeshRenderer>(), "changed blendshape weights by DualQuaternionSkinner component");

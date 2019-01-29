@@ -31,7 +31,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 	public ComputeShader shaderDQBlend;
 	public ComputeShader shaderApplyMorph;
 
-	public bool awakened { get; private set; } = false;
+	public bool started { get; private set; } = false;
 
 	ComputeBuffer bufPoseDq;
 	ComputeBuffer bufSkinnedDq;
@@ -99,7 +99,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 
 	public void SetBlendShapeWeight(int index, float value)
 	{
-		if (this.awakened == false)
+		if (this.started == false)
 		{
 			this.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(index, value);
 			return;
@@ -113,7 +113,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 
 	public float GetBlendShapeWeight(int index)
 	{
-		if (this.awakened == false)
+		if (this.started == false)
 			return this.GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(index);
 
 		if (index < 0 || index >= this.morphWeights.Length)
@@ -126,7 +126,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 	{
 		get
 		{
-			if (this.awakened == false)
+			if (this.started == false)
 				return this.GetComponent<SkinnedMeshRenderer>().sharedMesh;
 
 			return this.mf.mesh;
@@ -134,7 +134,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 
 		set
 		{
-			if (this.awakened == false)
+			if (this.started == false)
 				throw new System.InvalidOperationException("DualQuaternion.Skinner.mesh can only be assigned to after Awake() was called");
 
 			this.mf.mesh = value;
@@ -407,8 +407,12 @@ public class DualQuaternionSkinner : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	void Awake()
+	void Start()
 	{
+		this.shaderComputeBoneDQ = (ComputeShader)Instantiate(this.shaderComputeBoneDQ);	// bug workaround
+		this.shaderDQBlend = (ComputeShader)Instantiate(this.shaderDQBlend);                // bug workaround
+		this.shaderApplyMorph = (ComputeShader)Instantiate(this.shaderApplyMorph);          // bug workaround
+
 		SkinnedMeshRenderer smr = this.gameObject.GetComponent<SkinnedMeshRenderer>();
 		this.mf = this.GetComponent<MeshFilter>();
 
@@ -433,7 +437,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 
 		Destroy(smr);
 
-		this.awakened = true;
+		this.started = true;
 	}
 
 	// Update is called once per frame
