@@ -47,17 +47,16 @@ public class DualQuaternionSkinnedEditor : Editor
 				EditorGUI.BeginChangeCheck();
 				Undo.RecordObject(dqs.gameObject.GetComponent<SkinnedMeshRenderer>(), "changed blendshape weights by DualQuaternionSkinner component");
 			}
-
-			EditorGUI.indentLevel = 1;
 			
 			for (int i = 0; i < dqs.mesh.blendShapeCount; i++)
 			{
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.LabelField("   " + dqs.mesh.GetBlendShapeName(i), GUILayout.Width(EditorGUIUtility.labelWidth - 10));
 				float weight = EditorGUILayout.Slider(dqs.GetBlendShapeWeight(i), 0, 100);
+				EditorGUILayout.EndHorizontal();
 				dqs.SetBlendShapeWeight(i, weight);
 			}
 		}
-
-		EditorGUI.indentLevel = 0;
 
 		EditorGUILayout.Space();
 		EditorGUILayout.Space();
