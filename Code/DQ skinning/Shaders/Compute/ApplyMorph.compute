@@ -1,0 +1,16 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+#include "DQ.cginc"
+
+RWStructuredBuffer<float3> source;
+RWStructuredBuffer<float3> target;
+RWStructuredBuffer<float3> delta;
+
+float weight;
+
+[numthreads(1024, 1, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+	target[id.x] = source.Load(id.x) + delta.Load(id.x) * weight;
+}
