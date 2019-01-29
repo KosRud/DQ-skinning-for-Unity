@@ -10,7 +10,7 @@
 
 |Gif|Difference|
 |----|----|
-|<img src="Screenshots/before-after.gif" width="500px">|<img src="Screenshots/diff.png" width="500px">|
+|<img src="Screenshots/before-after.gif">|<img src="Screenshots/diff.png">|
 
 
 ### warning
