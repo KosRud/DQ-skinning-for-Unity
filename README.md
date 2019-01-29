@@ -48,3 +48,5 @@ After extracting the bone array in **Awake()** my script removes **SkinnedMeshRe
 Alas it's complicated. I added comments to "Standard hacked for DQ skinning" marking the alterations i made to the Standard shader. You can try to do the same with your own shader to make it work with the script.
 
 Feel free to contact me in [this thread](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/) at **unity forum** if you need help.
+
+I would also like to hear about your projects that use my script and your experience with it.
