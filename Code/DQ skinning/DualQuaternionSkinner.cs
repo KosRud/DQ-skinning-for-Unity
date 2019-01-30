@@ -248,25 +248,25 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
 		// https://developer.nvidia.com/content/understanding-structured-buffer-performance
 		this.bufOriginalVertices = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
+		Vector3[] vertices = this.mf.mesh.vertices;
 		for (int i = 0; i < this.mf.mesh.vertexCount; i++)
-			tempVec4[i] = this.mf.mesh.vertices[i];
+			tempVec4[i] = vertices[i];
 		this.bufOriginalVertices.SetData(tempVec4);
 		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "original_vertices", this.bufOriginalVertices);
 
 		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
 		// https://developer.nvidia.com/content/understanding-structured-buffer-performance
 		this.bufOriginalNormals = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
+		Vector3[] normals = this.mf.mesh.normals;
 		for (int i = 0; i < this.mf.mesh.vertexCount; i++)
-			tempVec4[i] = this.mf.mesh.normals[i];
+			tempVec4[i] = normals[i];
 		this.bufOriginalNormals.SetData(tempVec4);
 		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "original_normals", this.bufOriginalNormals);
 
 		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
 		// https://developer.nvidia.com/content/understanding-structured-buffer-performance
 		this.bufOriginalTangents = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
-		for (int i = 0; i < this.mf.mesh.vertexCount; i++)
-			tempVec4[i] = this.mf.mesh.tangents[i];
-		this.bufOriginalTangents.SetData(tempVec4);
+		this.bufOriginalTangents.SetData(this.mf.mesh.tangents);
 		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "original_tangents", this.bufOriginalTangents);
 
 		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
