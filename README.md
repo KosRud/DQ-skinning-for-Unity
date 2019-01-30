@@ -139,7 +139,7 @@ I would also like to hear about your projects that use my script and your experi
 </table>
 
 **I know the name of a blend shape. How do i get the index?**<br>
-\- Use **mesh.GetBlendShapeIndex**(string **blendShapeName**)
+\- Use mesh.GetBlendShapeIndex(string blendShapeName)
 
 **How do i get the number of available blend shapes?**<br>
-\- Use **mesh.blendShapeCount**
+\- Use mesh.blendShapeCount
