@@ -1,4 +1,4 @@
-# Dual quaternion skinning for Unity3D
+# Dual quaternion skinning for Unity
 
 ### Features:
 * GPU skinning with compute shaders (only)
