@@ -19,7 +19,7 @@ You will not see any effect in edit mode.<br>
 The scipt only works in play mode.<br>
 If you see no effect in play mode verify that you are using the right shader.
 
-<br><br><br><br>
+<br><br><br>
 
 ### Performance:
 
@@ -29,7 +29,7 @@ As long as you are not creating hundreds of characters with complex rigs (no mat
 
 If anyone knows how to optimize extracting position and rotation of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on the [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
 
-----
+<br><br><br>
 
 ### How to set up
 
@@ -39,7 +39,7 @@ If anyone knows how to optimize extracting position and rotation of the bones pl
 
 The shader is "**MadCake/Material/Standard hacked for DQ skinning**"
 
-----
+<br><br><br>
 
 ### Why do i need SkinnedMeshRenderer?
 
@@ -51,7 +51,7 @@ After extracting the bone array in **Start()** my script removes **SkinnedMeshRe
 All the animations are made by the script.<br>
 You can verify it in the editor after hitting play button.
 
-----
+<br><br><br>
 
 ### How do i use custom shaders?
 
@@ -63,7 +63,7 @@ Feel free to contact me in [this thread](https://forum.unity.com/threads/dual-qu
 
 I would also like to hear about your projects that use my script and your experience with it.
 
-----
+<br><br><br>
 
 ### API
 
