@@ -81,7 +81,7 @@ I would also like to hear about your projects that use my script and your experi
 
 <table>
 <tr>
-  <th>type</th>
+  <th>Type</th>
   <th>Name</th>
   <th>Description</th>
 </tr>
@@ -110,7 +110,7 @@ I would also like to hear about your projects that use my script and your experi
 
 <table>
 <tr>
-  <th width="80">return type</th>
+  <th width="80">Return type</th>
   <th width="360">Name</th>
   <th>Description</th>
 </tr>
@@ -141,7 +141,7 @@ I would also like to hear about your projects that use my script and your experi
 
 <table>
 <tr>
-  <th width="200">type</th>
+  <th width="200">Type</th>
   <th width="200">Name</th>
   <th>Description</th>
 </tr>
