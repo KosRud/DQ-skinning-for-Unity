@@ -155,30 +155,44 @@ public class DualQuaternionSkinner : MonoBehaviour {
 
 		this.morphWeights = new float[this.mf.mesh.blendShapeCount];
 
+		var deltaVertices = new Vector3[this.mf.mesh.vertexCount];
+		var deltaNormals = new Vector3[this.mf.mesh.vertexCount];
+		var deltaTangents = new Vector3[this.mf.mesh.vertexCount];
+		var tempVec4 = new Vector4[this.mf.mesh.vertexCount];
+
 		for (int i = 0; i < this.mf.mesh.blendShapeCount; i++)
 		{
-			var deltaVertices = new Vector3[this.mf.mesh.vertexCount];
-			var deltaNormals = new Vector3[this.mf.mesh.vertexCount];
-			var deltaTangents = new Vector3[this.mf.mesh.vertexCount];
-
 			this.mf.mesh.GetBlendShapeFrameVertices(i, 0, deltaVertices, deltaNormals, deltaTangents);
 
 			if (deltaVertices != null)
 			{
-				this.arrBufMorphDeltaVertices[i] = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
-				this.arrBufMorphDeltaVertices[i].SetData(deltaVertices);
+
+				// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
+				// https://developer.nvidia.com/content/understanding-structured-buffer-performance
+				this.arrBufMorphDeltaVertices[i] = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
+				for (int k = 0; k < this.mf.mesh.vertexCount; k++)
+					tempVec4[k] = deltaVertices[k];
+				this.arrBufMorphDeltaVertices[i].SetData(tempVec4);
 			}
 
 			if (deltaNormals != null)
 			{
-				this.arrBufMorphDeltaNormals[i] = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
-				this.arrBufMorphDeltaNormals[i].SetData(deltaNormals);
+				// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
+				// https://developer.nvidia.com/content/understanding-structured-buffer-performance
+				this.arrBufMorphDeltaNormals[i] = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
+				for (int k = 0; k < this.mf.mesh.vertexCount; k++)
+					tempVec4[k] = deltaNormals[k];
+				this.arrBufMorphDeltaNormals[i].SetData(tempVec4);
 			}
 
 			if (deltaTangents != null)
 			{
-				this.arrBufMorphDeltaTangents[i] = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
-				this.arrBufMorphDeltaTangents[i].SetData(deltaTangents);
+				// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
+				// https://developer.nvidia.com/content/understanding-structured-buffer-performance
+				this.arrBufMorphDeltaTangents[i] = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) *  4);
+				for (int k = 0; k < this.mf.mesh.vertexCount; k++)
+					tempVec4[k] = deltaTangents[k];
+				this.arrBufMorphDeltaTangents[i].SetData(tempVec4);
 			}
 		}
 
@@ -231,30 +245,36 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "skinned_dual_quaternions", this.bufSkinnedDq);
 		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "skinned_dual_quaternions", this.bufSkinnedDq);
 
-		this.bufOriginalVertices = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
-		this.bufOriginalVertices.SetData(this.mf.mesh.vertices);
+		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
+		// https://developer.nvidia.com/content/understanding-structured-buffer-performance
+		this.bufOriginalVertices = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
+		for (int i = 0; i < this.mf.mesh.vertexCount; i++)
+			tempVec4[i] = this.mf.mesh.vertices[i];
+		this.bufOriginalVertices.SetData(tempVec4);
 		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "original_vertices", this.bufOriginalVertices);
 
-		this.bufOriginalNormals = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
-		this.bufOriginalNormals.SetData(this.mf.mesh.normals);
+		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
+		// https://developer.nvidia.com/content/understanding-structured-buffer-performance
+		this.bufOriginalNormals = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
+		for (int i = 0; i < this.mf.mesh.vertexCount; i++)
+			tempVec4[i] = this.mf.mesh.normals[i];
+		this.bufOriginalNormals.SetData(tempVec4);
 		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "original_normals", this.bufOriginalNormals);
 
-		this.bufOriginalTangents = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
-		var tangents = new Vector3[this.mf.mesh.vertexCount];
-		Vector4[] vec4Tangents = this.mf.mesh.tangents;
+		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
+		// https://developer.nvidia.com/content/understanding-structured-buffer-performance
+		this.bufOriginalTangents = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
 		for (int i = 0; i < this.mf.mesh.vertexCount; i++)
-		{
-			tangents[i].x = vec4Tangents[i].x;
-			tangents[i].y = vec4Tangents[i].y;
-			tangents[i].z = vec4Tangents[i].z;
-		}
-		this.bufOriginalTangents.SetData(tangents);
+			tempVec4[i] = this.mf.mesh.tangents[i];
+		this.bufOriginalTangents.SetData(tempVec4);
 		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "original_tangents", this.bufOriginalTangents);
 
-		this.bufMorphedVertices = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
-		this.bufMorphedNormals = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
-		this.bufMorphedTangents = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
-		this.bufMorphTemp = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 3);
+		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
+		// https://developer.nvidia.com/content/understanding-structured-buffer-performance
+		this.bufMorphedVertices = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
+		this.bufMorphedNormals = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
+		this.bufMorphedTangents = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
+		this.bufMorphTemp = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
 
 		// bone info buffer
 
@@ -477,6 +497,9 @@ public class DualQuaternionSkinner : MonoBehaviour {
 			this.poseDualQuaternions[i].rotationQuaternion = this.bones[i].rotation.ToVector4();
 
 			Vector3 pos = this.bones[i].position;
+
+			// could use float3 instead of float4 for position but NVidia says structures not aligned to 128 bits are slow
+			// https://developer.nvidia.com/content/understanding-structured-buffer-performance
 			this.poseDualQuaternions[i].translationQuaternion = new Vector4(pos.x, pos.y, pos.z, 1);
 		}
 

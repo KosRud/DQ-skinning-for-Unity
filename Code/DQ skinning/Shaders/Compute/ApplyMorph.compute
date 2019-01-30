@@ -3,9 +3,9 @@
 
 #include "DQ.cginc"
 
-RWStructuredBuffer<float3> source;
-RWStructuredBuffer<float3> target;
-RWStructuredBuffer<float3> delta;
+RWStructuredBuffer<float4> source;
+RWStructuredBuffer<float4> target;
+RWStructuredBuffer<float4> delta;
 
 float weight;
 
