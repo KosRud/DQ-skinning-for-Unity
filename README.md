@@ -65,6 +65,8 @@ I would also like to hear about your projects that use my script and your experi
 
 `class DualQuaternionSkinner : MonoBehaviour`
 
+<br>
+
 **public fields:**
 
 <table>
@@ -93,6 +95,7 @@ I would also like to hear about your projects that use my script and your experi
 </tr>
 </table>
 
+<br><br>
 **public methods:**
 
 <table>
@@ -123,6 +126,7 @@ I would also like to hear about your projects that use my script and your experi
 </tr>
 </table>
 
+<br><br>
 **public properties:**
 
 <table>
@@ -137,6 +141,8 @@ I would also like to hear about your projects that use my script and your experi
   <td>The mesh being rendered.<br><br>By default the mesh will be copied from <b>SkinnedMeshRenderer</b> before this component is removed during <b>Start( )</b>.</td>
 </tr>
 </table>
+
+<br><br>
 
 **I know the name of a blend shape. How do i get the index?**<br>
 `mesh.GetBlendShapeIndex(string blendShapeName)`
