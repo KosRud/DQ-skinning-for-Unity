@@ -137,3 +137,9 @@ I would also like to hear about your projects that use my script and your experi
   <td>The mesh being rendered.<br><br>By default the mesh will be copied from <b>SkinnedMeshRenderer</b> before this component is removed during <b>Start( )</b>.</td>
 </tr>
 </table>
+
+**I know the name of a blend shape. How do i get the index?**<br>
+\- Use **mesh.GetBlendShapeIndex**(string **blendShapeName**)
+
+**How do i get the number of available blend shapes?**<br>
+\- Use **mesh.blendShapeCount**
