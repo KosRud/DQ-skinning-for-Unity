@@ -5,8 +5,8 @@ public class DualQuaternionSkinner : MonoBehaviour {
 
 	struct DualQuaternion
 	{
-		public Vector4 rotationQuaternion;
-		public Vector4 translationQuaternion;
+		public Quaternion rotationQuaternion;
+		public Vector4 position;
 	}
 
 	struct BoneWeightInfo
@@ -304,10 +304,10 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		var bindDqs = new DualQuaternion[bindPoses.Length];
 		for (int i = 0; i < bindPoses.Length; i++)
 		{
-			bindDqs[i].rotationQuaternion = bindPoses[i].ExtractRotation().ToVector4();
+			bindDqs[i].rotationQuaternion = bindPoses[i].ExtractRotation();
 
 			Vector3 pos = bindPoses[i].ExtractPosition();
-			bindDqs[i].translationQuaternion = new Vector4(pos.x, pos.y, pos.z, 1);
+			bindDqs[i].position = new Vector4(pos.x, pos.y, pos.z, 1);
 		}
 
 		this.bufBindDq = new ComputeBuffer(bindDqs.Length, sizeof(float) * 8);
@@ -494,13 +494,13 @@ public class DualQuaternionSkinner : MonoBehaviour {
 
 		for (int i = 0; i < this.bones.Length; i++)
 		{
-			this.poseDualQuaternions[i].rotationQuaternion = this.bones[i].rotation.ToVector4();
+			this.poseDualQuaternions[i].rotationQuaternion = this.bones[i].rotation;
 
 			Vector3 pos = this.bones[i].position;
 
 			// could use float3 instead of float4 for position but NVidia says structures not aligned to 128 bits are slow
 			// https://developer.nvidia.com/content/understanding-structured-buffer-performance
-			this.poseDualQuaternions[i].translationQuaternion = new Vector4(pos.x, pos.y, pos.z, 1);
+			this.poseDualQuaternions[i].position = new Vector4(pos.x, pos.y, pos.z, 1);
 		}
 
 		this.bufPoseDq.SetData(this.poseDualQuaternions);
