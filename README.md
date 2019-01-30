@@ -63,7 +63,7 @@ I would also like to hear about your projects that use my script and your experi
 
 ### API
 
-class DualQuaternionSkinner : MonoBehaviour
+`class DualQuaternionSkinner : MonoBehaviour`
 
 **public fields:**
 
@@ -111,6 +111,29 @@ class DualQuaternionSkinner : MonoBehaviour
   <td>SetBlendShapeWeights(float[ ] weights)</td>
   <td>Applies blend shape weights from given array.<br><br>The length of provided array must match the number of blend shapes that currently rendered mesh has.</td>
 </tr>
+<tr>
+  <td>float</td>
+  <td>GetBlendShapeWeight(int index)</td>
+  <td>Returns the currently applied weight for the blend shape with given index.</td>
+</tr>
+<tr>
+  <td>void</td>
+  <td>SetBlendShapeWeight(int index, float weight)</td>
+  <td>Applies the weight for the blend shape with given index.</td>
+</tr>
 </table>
 
-**... (wip)**
+**public properties:**
+
+<table>
+<tr>
+  <th width="200">type</th>
+  <th width="200">Name</th>
+  <th>Description</th>
+</tr>
+<tr>
+  <td>UnityEngine.Mesh</td>
+  <td>mesh { get; set; }</td>
+  <td>The mesh being rendered.<br><br>By default the mesh will be copied from <b>SkinnedMeshRenderer</b> before this component is removed during <b>Start( )</b>.</td>
+</tr>
+</table>
