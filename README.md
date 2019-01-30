@@ -7,11 +7,15 @@
 * **preserves volume** with deformation (look comparison)
 * **zero GC allocations** per frame
 
+<br>
+
 ### Comparison:
 
 |Gif|Difference|
 |----|----|
 |<img src="Screenshots/before-after.gif">|<img src="Screenshots/diff.png">|
+
+<br>
 
 
 ### Warning:
@@ -69,7 +73,7 @@ I would also like to hear about your projects that use my script and your experi
 
 `class DualQuaternionSkinner : MonoBehaviour`
 
-<br>
+<br><br>
 
 **public fields:**
 
@@ -99,7 +103,7 @@ I would also like to hear about your projects that use my script and your experi
 </tr>
 </table>
 
-<br><br>
+<br><br><br>
 **public methods:**
 
 <table>
@@ -130,7 +134,7 @@ I would also like to hear about your projects that use my script and your experi
 </tr>
 </table>
 
-<br><br>
+<br><br><br>
 **public properties:**
 
 <table>
