@@ -13,9 +13,9 @@ bool _OnlyRotation;
 
 RWStructuredBuffer<dual_quaternion> skinned_dual_quaternions;
 RWStructuredBuffer<bone_weight_info> bone_weights;
-RWStructuredBuffer<float3> original_vertices;
-RWStructuredBuffer<float3> original_normals;
-RWStructuredBuffer<float3> original_tangents;
+RWStructuredBuffer<float4> original_vertices;
+RWStructuredBuffer<float4> original_normals;
+RWStructuredBuffer<float4> original_tangents;
 
 uint textureWidth;
 RWTexture2D<float4> skinned_data_1;
@@ -110,9 +110,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	pos.x = id.x % textureWidth;
 	pos.y = id.x / textureWidth;
 
-	float3 vertex = SkinVertex(original_vertices.Load(id.x), id.x);
-	float3 normal = SkinNormal(original_normals.Load(id.x), id.x);
-	float3 tangent = original_tangents.Load(id.x);
+	float3 vertex = SkinVertex(original_vertices.Load(id.x).xyz, id.x);
+	float3 normal = SkinNormal(original_normals.Load(id.x).xyz, id.x);
+	float3 tangent = original_tangents.Load(id.x).xyz;
 
 	skinned_data_1[pos] = float4(vertex.xyz, normal.x);
 	skinned_data_2[pos] = float4(normal.yz,vertex.xy);
