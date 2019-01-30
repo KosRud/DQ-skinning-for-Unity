@@ -71,8 +71,6 @@ I would also like to hear about your projects that use my script and your experi
 
 ----
 
-<br>
-
 ### API
 
 `class DualQuaternionSkinner : MonoBehaviour`
