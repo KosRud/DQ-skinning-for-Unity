@@ -75,20 +75,20 @@ I would also like to hear about your projects that use my script and your experi
 </tr>
 <tr>
   <td>ComputeShader</td>
-  <td>shaderComputeBoneDQ</td>
+  <td><b>shaderComputeBoneDQ</b></td>
   <td rowspan="3">These fields hold references to compute shaders used by the script.<br>They are assigned automatically.<br><br>Do not change them unless you know what you're doing.</td>
 </tr>
 <tr>
   <td>ComputeShader</td>
-  <td>shaderDQBlend</td>
+  <td><b>shaderDQBlend</b></td>
 </tr>
 <tr>
   <td>ComputeShader</td>
-  <td>shaderApplyMorph</td>
+  <td><b>shaderApplyMorph</b></td>
 </tr>
 <tr>
   <td>bool</td>
-  <td>started</td>
+  <td><b>started</b></td>
   <td>Indicates whether <b>Start()</b> method of the script has already been called.<br><br> Useful to know whether the <b>SkinnedMeshRenderer</b> component was already destroyed.</td>
 </tr>
 </table>
@@ -98,27 +98,27 @@ I would also like to hear about your projects that use my script and your experi
 <table>
 <tr>
   <th width="80">type</th>
-  <th width="320">Name</th>
+  <th width="360">Name</th>
   <th>Description</th>
 </tr>
 <tr>
   <td>float[ ]</td>
-  <td>GetBlendShapeWeights( )</td>
+  <td><b>GetBlendShapeWeights</b>( )</td>
   <td>Returns an array of currently applied blend shape weights sorted by blend shape index.</td>
 </tr>
 <tr>
   <td>void</td>
-  <td>SetBlendShapeWeights(float[ ] weights)</td>
+  <td><b>SetBlendShapeWeights</b>(float[ ] weights)</td>
   <td>Applies blend shape weights from given array.<br><br>The length of provided array must match the number of blend shapes that currently rendered mesh has.</td>
 </tr>
 <tr>
   <td>float</td>
-  <td>GetBlendShapeWeight(int index)</td>
+  <td><b>GetBlendShapeWeight</b>(int index)</td>
   <td>Returns the currently applied weight for the blend shape with given index.</td>
 </tr>
 <tr>
   <td>void</td>
-  <td>SetBlendShapeWeight(int index, float weight)</td>
+  <td><b>SetBlendShapeWeight</b>(int index, float weight)</td>
   <td>Applies the weight for the blend shape with given index.</td>
 </tr>
 </table>
@@ -133,7 +133,7 @@ I would also like to hear about your projects that use my script and your experi
 </tr>
 <tr>
   <td><a href="https://docs.unity3d.com/ScriptReference/Mesh.html">UnityEngine.Mesh</a></td>
-  <td>mesh { get; set; }</td>
+  <td><b>mesh</b> { get; set; }</td>
   <td>The mesh being rendered.<br><br>By default the mesh will be copied from <b>SkinnedMeshRenderer</b> before this component is removed during <b>Start( )</b>.</td>
 </tr>
 </table>
