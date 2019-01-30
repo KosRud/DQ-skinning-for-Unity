@@ -101,14 +101,14 @@ public class DualQuaternionSkinner : MonoBehaviour {
 	{
 		if (this.started == false)
 		{
-			this.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(index, value);
+			this.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(index, weight);
 			return;
 		}
 
 		if (index < 0 || index >= this.morphWeights.Length)
 			throw new System.IndexOutOfRangeException("Blend shape index out of range");
 
-		this.morphWeights[index] = value / 100f;
+		this.morphWeights[index] = weight / 100f;
 	}
 
 	public float GetBlendShapeWeight(int index)
