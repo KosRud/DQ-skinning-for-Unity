@@ -19,7 +19,7 @@ You will not see any effect in edit mode.<br>
 The scipt only works in play mode.<br>
 If you see no effect in play mode verify that you are using the right shader.
 
-----
+<br><br><br><br>
 
 ### Performance:
 
