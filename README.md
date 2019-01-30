@@ -93,4 +93,24 @@ I would also like to hear about your projects that use my script and your experi
 </tr>
 </table>
 
+**public methods:**
+
+<table>
+<tr>
+  <th width="80">type</th>
+  <th width="320">Name</th>
+  <th>Description</th>
+</tr>
+<tr>
+  <td>float[ ]</td>
+  <td>GetBlendShapeWeights( )</td>
+  <td>Returns an array of currently applied blend shape weights sorted by blend shape index.</td>
+</tr>
+<tr>
+  <td>void</td>
+  <td>SetBlendShapeWeights(float[ ] weights)</td>
+  <td>Applies blend shape weights from given array.<br><br>The length of provided array must match the number of blend shapes that currently rendered mesh has.</td>
+</tr>
+</table>
+
 **... (wip)**
