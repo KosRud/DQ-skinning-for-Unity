@@ -97,7 +97,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 			this.morphWeights[i] = weights[i] / 100f;
 	}
 
-	public void SetBlendShapeWeight(int index, float value)
+	public void SetBlendShapeWeight(int index, float weight)
 	{
 		if (this.started == false)
 		{
