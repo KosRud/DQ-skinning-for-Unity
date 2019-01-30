@@ -110,7 +110,7 @@ I would also like to hear about your projects that use my script and your experi
 
 <table>
 <tr>
-  <th width="80">type</th>
+  <th width="80">return type</th>
   <th width="360">Name</th>
   <th>Description</th>
 </tr>
