@@ -39,7 +39,7 @@ The shader is "**MadCake/Material/Standard hacked for DQ skinning**"
 
 My scripts uses **SkinnedMeshRenderer** to extract an array of bones from it. Yep, that's it. The order of bones is unpredictable and does not depent on their hierarchy. Only SkinnedMeshRenderer knows it ¯\\\_(ツ)\_/¯
 
-After extracting the bone array in **Awake()** my script removes **SkinnedMeshRenderer** component as it is no longer needed. All the animations are made by the script. You can verify it in the editor after hitting play button.
+After extracting the bone array in **Start()** my script removes **SkinnedMeshRenderer** component as it is no longer needed. All the animations are made by the script. You can verify it in the editor after hitting play button.
 
 ----
 
