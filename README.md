@@ -132,7 +132,7 @@ I would also like to hear about your projects that use my script and your experi
   <th>Description</th>
 </tr>
 <tr>
-  <td>UnityEngine.Mesh</td>
+  <td><a href="https://docs.unity3d.com/ScriptReference/Mesh.html">UnityEngine.Mesh</a></td>
   <td>mesh { get; set; }</td>
   <td>The mesh being rendered.<br><br>By default the mesh will be copied from <b>SkinnedMeshRenderer</b> before this component is removed during <b>Start( )</b>.</td>
 </tr>
