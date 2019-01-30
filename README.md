@@ -35,7 +35,7 @@ If anyone knows how to optimize extracting position and rotation of the bones pl
 
 <br><br><br>
 
-### How to set up
+### How to set up:
 
 * Create a normal skinned character with `SkinnedMeshRenderer` component
 * Add `DualQuaternionSkinner.cs` component (it will require a `MeshFilter` component)
