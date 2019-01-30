@@ -23,7 +23,11 @@ If you see no effect in play mode verify that you are using the right shader.
 
 ### Performance:
 
-* ToDo benchmark
+During my testing the amount of time spent on actual skinning was negligible compared to the amount of time extracting **transform.position** and **transform.rotation** from every bone in the hierarchy.
+
+As long as you are not creating hundreds of characters with complex rigs (no matter the polycount) there should be no significant performance hit.
+
+If anyone knows how to optimize extracting position and rotation of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on the [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
 
 ----
 
