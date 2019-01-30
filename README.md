@@ -108,17 +108,17 @@ I would also like to hear about your projects that use my script and your experi
 </tr>
 <tr>
   <td>void</td>
-  <td><b>SetBlendShapeWeights</b>(float[ ] weights)</td>
+  <td><b>SetBlendShapeWeights</b>(float[ ] <b>weights</b>)</td>
   <td>Applies blend shape weights from given array.<br><br>The length of provided array must match the number of blend shapes that currently rendered mesh has.</td>
 </tr>
 <tr>
   <td>float</td>
-  <td><b>GetBlendShapeWeight</b>(int index)</td>
+  <td><b>GetBlendShapeWeight</b>(int <b>index</b>)</td>
   <td>Returns the currently applied weight for the blend shape with given index.</td>
 </tr>
 <tr>
   <td>void</td>
-  <td><b>SetBlendShapeWeight</b>(int index, float weight)</td>
+  <td><b>SetBlendShapeWeight</b>(int <b>index</b>, float <b>weight</b>)</td>
   <td>Applies the weight for the blend shape with given index.</td>
 </tr>
 </table>
