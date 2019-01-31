@@ -57,10 +57,6 @@ Feel free to contact me in [this thread](https://forum.unity.com/threads/dual-qu
 
 I would also like to hear about your projects that use my script and your experience with it.
 
-<br>
-
-----
-
-### API
+## API
 
 [Documentation](https://constantinerudenko.github.io/Docs/DQ-skinning-for-Unity/annotated.html)
