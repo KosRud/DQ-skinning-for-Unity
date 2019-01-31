@@ -18,19 +18,15 @@
 <br>
 
 
-### Warning:
+# Warning:
 You will not see any effect in edit mode.<br>
 The scipt only works in play mode.<br>
 If you see no effect in play mode verify that you are using the right shader.
 
-<br><br><br>
-
-### Unity version
+## Unity version
 The script was developed for Unity **2018.3.3.f1**. Other versions may refuse to compile `HackedStandard.shader` as the Standard shader changes from version to version and compatibility is not guaranteed.
 
-<br><br><br>
-
-### Performance:
+## Performance:
 
 During my testing the amount of time spent on actual skinning was negligible compared to the amount of time extracting `transform.position` and `transform.rotation` from every bone in the hierarchy.
 
@@ -38,9 +34,7 @@ As long as you are not creating hundreds of characters with complex rigs (no mat
 
 If anyone knows how to optimize extracting position and rotation of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on the [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
 
-<br><br><br>
-
-### How to set up:
+## How to set up:
 
 * Create a normal skinned character with `SkinnedMeshRenderer` component
 * Add `DualQuaternionSkinner.cs` component (it will require a `MeshFilter` component)
@@ -48,9 +42,7 @@ If anyone knows how to optimize extracting position and rotation of the bones pl
 
 The shader is `MadCake/Material/Standard hacked for DQ skinning`
 
-<br><br><br>
-
-### Why do i need SkinnedMeshRenderer?
+## Why do i need SkinnedMeshRenderer?
 
 My scripts uses `SkinnedMeshRenderer` to extract an array of bones from it. Yep, that's it.<br>
 The order of bones is unpredictable and does not depent on their hierarchy.<br>
@@ -60,9 +52,7 @@ After extracting the bone array in `Start()` my script removes `SkinnedMeshRende
 All the animations are made by the script.<br>
 You can verify it in the editor after hitting play button.
 
-<br><br><br>
-
-### How do i use custom shaders?
+## How do i use custom shaders?
 
 Alas it's complicated.<br>
 I added comments to "Standard hacked for DQ skinning" marking the alterations i made to the Standard shader.<br>
