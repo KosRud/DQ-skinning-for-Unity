@@ -1,5 +1,14 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Replaces Unity's default linear skinning with DQ skinning
+/// 
+/// Add this component to a <a class="bold" href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</a> that has <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> attached.<br>
+/// Do not remove <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> component!<br>
+/// Make sure that all materials of the animated object are using shader \"<b>MadCake/Material/Standard hacked for DQ skinning</b>\"
+/// 
+/// <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> is required to extract some information about the mesh during <b>Start()</b> and is destroyed immediately after. 
+/// </summary>
 [RequireComponent(typeof(MeshFilter))]
 public class DualQuaternionSkinner : MonoBehaviour {
 
@@ -31,6 +40,10 @@ public class DualQuaternionSkinner : MonoBehaviour {
 	public ComputeShader shaderDQBlend;
 	public ComputeShader shaderApplyMorph;
 
+	/// <summary>
+	/// Indicates whether Start( ) has already been called.<br>
+	/// When set to <b>true</b> indicates that <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> component was already destroyed.
+	/// </summary>
 	public bool started { get; private set; } = false;
 
 	ComputeBuffer bufPoseDq;
@@ -76,6 +89,12 @@ public class DualQuaternionSkinner : MonoBehaviour {
 	int kernelHandleDQBlend;
 	int kernelHandleApplyMorph;
 
+	/// <summary>
+	/// Returns an array of currently applied blend shape weights.
+	/// 
+	/// Default range is 0-100. It is possible to apply negative weights or exceeding 100.
+	/// </summary>
+	/// <returns>Array of currently applied blend shape weights.</returns>
 	public float[] GetBlendShapeWeights()
 	{
 		float[] weights = new float[this.morphWeights.Length];
@@ -84,6 +103,12 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		return weights;
 	}
 
+	/// <summary>
+	/// Applies blend shape weights from the given array.
+	/// 
+	/// Default range is 0-100. It is possible to apply negative weights or exceeding 100.
+	/// </summary>
+	/// <param name="weights">An array of weights to be applied</param>
 	public void SetBlendShapeWeights(float[] weights)
 	{
 		if (weights.Length != this.morphWeights.Length)
@@ -97,6 +122,13 @@ public class DualQuaternionSkinner : MonoBehaviour {
 			this.morphWeights[i] = weights[i] / 100f;
 	}
 
+	/// <summary>
+	/// Set weight for the blend shape with given index.
+	/// 
+	/// Default range is 0-100. It is possible to apply negative weights or exceeding 100.
+	/// </summary>
+	/// <param name="index">Index of the blend shape</param>
+	/// <param name="weight">Weight to be applied</param>
 	public void SetBlendShapeWeight(int index, float weight)
 	{
 		if (this.started == false)
@@ -111,6 +143,11 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		this.morphWeights[index] = weight / 100f;
 	}
 
+	/// <summary>
+	/// Returns currently applied weight for the blend shape with given index.
+	/// </summary>
+	/// <param name="index">Index of the blend shape</param>
+	/// <returns>Currently applied weight.</returns>
 	public float GetBlendShapeWeight(int index)
 	{
 		if (this.started == false)
@@ -122,6 +159,12 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		return this.morphWeights[index] * 100f;
 	}
 
+	/// <summary>
+	/// UnityEngine.<a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh.html">Mesh</a> that is currently being rendered.
+	/// @see <a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh.GetBlendShapeName.html">Mesh.GetBlendShapeName(int shapeIndex)</a>
+	/// @see <a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh.GetBlendShapeIndex.html">Mesh.GetBlendShapeIndex(string blendShapeName)</a>
+	/// @see <a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh-blendShapeCount.html">Mesh.blendShapeCount</a>
+	/// </summary>
 	public Mesh mesh
 	{
 		get
