@@ -429,11 +429,11 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 					opos
 
 					#ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
-						, out o
+						, o
 					#endif
 
 					#ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
-						, out os
+						, os
 					#endif
 				);
 			}
@@ -920,11 +920,11 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 					opos
 
 					#ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
-						, out o
+						, o
 					#endif
 
 					#ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
-						, out os
+						, os
 					#endif
 				);
 			}
