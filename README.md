@@ -64,3 +64,5 @@ I would also like to hear about your projects that use my script and your experi
 ## Known bugs
 
 Setting rendering mode of the material with shader `MadCake/Material/Standard hacked for DQ skinning` to anything other that Opaque causes a shader compilation error.
+
+When [Animator](https://docs.unity3d.com/ScriptReference/Animator.html).[cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) is set to anything other than **Always Animate**, it treats the mesh as if it is never visible. If you want to use animation culling, you will need to write a custom controller switching [Animator](https://docs.unity3d.com/ScriptReference/Animator.html).[cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) back and forth depending on object's visibility.
