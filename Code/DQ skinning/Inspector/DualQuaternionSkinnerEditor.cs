@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
+/// <summary>
+/// Provides custom inspector for {@link DualQuaternionSkinner}
+/// </summary>
 [CustomEditor(typeof(DualQuaternionSkinner))]
-public class DualQuaternionSkinnedEditor : Editor
+public class DualQuaternionSkinnerEditor : Editor
 {
 	SerializedProperty shaderComputeBoneDQ;
 	SerializedProperty shaderDQBlend;
