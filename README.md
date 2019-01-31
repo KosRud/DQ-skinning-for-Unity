@@ -60,3 +60,7 @@ I would also like to hear about your projects that use my script and your experi
 ## API
 
 [Documentation](https://constantinerudenko.github.io/Docs/DQ-skinning-for-Unity/annotated.html)
+
+## Known bugs
+
+Setting rendering mode of the material with shader `MadCake/Material/Standard hacked for DQ skinning` to anything other that Opaque causes a shader compilation error.
