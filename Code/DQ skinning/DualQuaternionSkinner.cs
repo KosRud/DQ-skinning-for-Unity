@@ -243,8 +243,8 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		if (mr == null)
 			mr = this.gameObject.AddComponent<MeshRenderer>();
 
-		mr.materials = this.materials;  // this is NOT a mistake
-		this.materials = mr.materials;      // this is NOT a mistake
+		mr.materials = this.materials;  // bug workaround
+		this.materials = mr.materials;  // bug workaround
 
 		foreach (Material m in mr.materials)
 		{
@@ -347,10 +347,8 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		var bindDqs = new DualQuaternion[bindPoses.Length];
 		for (int i = 0; i < bindPoses.Length; i++)
 		{
-			bindDqs[i].rotationQuaternion = bindPoses[i].ExtractRotation();
-
-			Vector3 pos = bindPoses[i].ExtractPosition();
-			bindDqs[i].position = new Vector4(pos.x, pos.y, pos.z, 1);
+			bindDqs[i].rotationQuaternion	= bindPoses[i].ExtractRotation();
+			bindDqs[i].position				= bindPoses[i].ExtractPosition();
 		}
 
 		this.bufBindDq = new ComputeBuffer(bindDqs.Length, sizeof(float) * 8);
