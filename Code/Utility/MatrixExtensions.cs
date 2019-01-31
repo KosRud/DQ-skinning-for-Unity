@@ -4,25 +4,14 @@ public static class MatrixExtensions
 {
 	public static Quaternion ExtractRotation(this Matrix4x4 matrix)
 	{
-		Vector3 forward;
-		forward.x = matrix.m02;
-		forward.y = matrix.m12;
-		forward.z = matrix.m22;
-
-		Vector3 upwards;
-		upwards.x = matrix.m01;
-		upwards.y = matrix.m11;
-		upwards.z = matrix.m21;
-
-		return Quaternion.LookRotation(forward, upwards);
+		return Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
 	}
 
 	public static Vector3 ExtractPosition(this Matrix4x4 matrix)
 	{
-		Vector3 position;
-		position.x = matrix.m03;
-		position.y = matrix.m13;
-		position.z = matrix.m23;
+		Vector4 position;
+		position = matrix.GetColumn(3);
+		position.w = 1;
 		return position;
 	}
 
