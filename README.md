@@ -7,16 +7,11 @@
 * preserves volume with deformation (look comparison)
 * zero GC allocations per frame
 
-<br>
-
 ### Comparison:
 
 |Gif|Difference|
 |----|----|
 |<img src="Screenshots/before-after.gif">|<img src="Screenshots/diff.png">|
-
-<br>
-
 
 # Warning:
 You will not see any effect in edit mode.<br>
