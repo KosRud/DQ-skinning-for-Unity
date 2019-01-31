@@ -110,12 +110,15 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
 			#pragma vertex vertSkinnedForward // original #pragma vertex (above) was commented
 
+			// expanded version of original vertex input structure
 			struct VertexInputSkinningForward
 			{
 				float4 vertex   : POSITION;
 				half3 normal    : NORMAL;
 				float2 uv0      : TEXCOORD0;
 				float2 uv1      : TEXCOORD1;
+
+				// this was added, everything else remains unchanged
 				uint id : SV_VertexID;
 
 				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
@@ -129,6 +132,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
+			// variables used for skining, always the same for every pass
 			sampler2D skinned_data_1;
 			sampler2D skinned_data_2;
 			sampler2D skinned_data_3;
@@ -136,6 +140,9 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 			uint skinned_tex_width;
 			bool _DoSkinning;
 
+			// the actual skinning function
+			// don't change the code but change the argument type to the name if vertex input structure used in current pass
+			// for this pass it is VertexInputSkinningForward
 			void vert(inout VertexInputSkinningForward v) {
 				if (_DoSkinning) {
 					float2 skinned_tex_uv;
@@ -163,24 +170,35 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 				}
 			}
 
+			// this function will replace the original vertex function (vertForwardBase)
+			// the return type is the same as in the original function
+			// the argument type is our expanded structure
 			VertexOutputForwardBase vertSkinnedForward(VertexInputSkinningForward vs)
 			{
+				// first we apply skinning
 				vert(vs);
 
+				// then we create the original vertex structure (VertexInput for this pass)
+				// and fill it with the data from our expanded version
 				VertexInput v;
 				v.vertex = vs.vertex;
 				v.normal = vs.normal;
 				v.uv0 = vs.uv0;
 				v.uv1 = vs.uv1;
 
+				// this variable is inside an "if defined" block in original structure
+				// so accessing it should be enclosed in identical "if defined" block
 				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
 					v.uv2 = vs.uv2;
 				#endif
 
+				// same here
 				#ifdef _TANGENT_TO_WORLD
 					v.tangent = vs.tangent;
 				#endif
 
+				// finally we pass the original vertex structure to the original vertex function
+				// and return the result
 				return vertForwardBase(v);
 			}
 
@@ -218,9 +236,87 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
             // Uncomment the following line to enable dithering LOD crossfade. Note: there are more in the file to uncomment for other passes.
             //#pragma multi_compile _ LOD_FADE_CROSSFADE
 
-            #pragma vertex vertAdd
+            //#pragma vertex vertAdd
             #pragma fragment fragAdd
             #include "UnityStandardCoreForward.cginc"
+
+			// ----- DQ modification start -----
+
+			#pragma vertex vertSkinnedForwardAdd // original #pragma vertex (above) was commented
+
+			struct VertexInputSkinningForwardAdd
+			{
+				float4 vertex   : POSITION;
+				half3 normal    : NORMAL;
+				float2 uv0      : TEXCOORD0;
+				float2 uv1      : TEXCOORD1;
+				uint id : SV_VertexID;
+
+				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+					float2 uv2      : TEXCOORD2;
+				#endif
+
+				#ifdef _TANGENT_TO_WORLD
+					half4 tangent   : TANGENT;
+				#endif
+
+				UNITY_VERTEX_INPUT_INSTANCE_ID
+			};
+
+			sampler2D skinned_data_1;
+			sampler2D skinned_data_2;
+			sampler2D skinned_data_3;
+			uint skinned_tex_height;
+			uint skinned_tex_width;
+			bool _DoSkinning;
+
+			void vert(inout VertexInputSkinningForwardAdd v) {
+				if (_DoSkinning) {
+					float2 skinned_tex_uv;
+
+					skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
+					skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
+
+					float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
+					float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
+
+					#ifdef _TANGENT_TO_WORLD
+						float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
+					#endif
+
+					v.vertex.xyz = data_1.xyz;
+					v.vertex.w = 1;
+
+					v.normal.x = data_1.w;
+					v.normal.yz = data_2.xy;
+
+					#ifdef _TANGENT_TO_WORLD
+						v.tangent.xy = data_2.zw;
+						v.tangent.z = data_3.x;
+					#endif
+				}
+			}
+
+			VertexOutputForwardAdd vertSkinnedForwardAdd(VertexInputSkinningForwardAdd vs)
+			{
+				vert(vs);
+
+				VertexInput v;
+				v.vertex = vs.vertex;
+				v.normal = vs.normal;
+				v.uv0 = vs.uv0;
+				v.uv1 = vs.uv1;
+
+				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+					v.uv2 = vs.uv2;
+				#endif
+
+				#ifdef _TANGENT_TO_WORLD
+					v.tangent = vs.tangent;
+				#endif
+
+				return vertAdd(v);
+			}
 
             ENDCG
         }
@@ -474,7 +570,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
             Cull Off
 
             CGPROGRAM
-            #pragma vertex vert_meta
+            //#pragma vertex vert_meta
             #pragma fragment frag_meta
 
             #pragma shader_feature _EMISSION
@@ -484,6 +580,89 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "UnityStandardMeta.cginc"
+
+			// ----- DQ modification start -----
+
+			#pragma vertex vertSkinnedMeta // original #pragma vertex (above) was commented
+
+			struct VertexInputSkinningMeta
+				{
+					float4 vertex   : POSITION;
+					half3 normal    : NORMAL;
+					float2 uv0      : TEXCOORD0;
+					float2 uv1      : TEXCOORD1;
+					uint id : SV_VertexID;
+
+					#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+						float2 uv2      : TEXCOORD2;
+					#endif
+
+					#ifdef _TANGENT_TO_WORLD
+						half4 tangent   : TANGENT;
+					#endif
+
+
+					UNITY_VERTEX_INPUT_INSTANCE_ID
+				};
+
+			sampler2D skinned_data_1;
+			sampler2D skinned_data_2;
+			sampler2D skinned_data_3;
+			uint skinned_tex_height;
+			uint skinned_tex_width;
+			bool _DoSkinning;
+
+			void vert(inout VertexInputSkinningMeta v) {
+				if (_DoSkinning) {
+					float2 skinned_tex_uv;
+
+					skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
+					skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
+
+					float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
+					float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
+
+					#ifdef _TANGENT_TO_WORLD
+						float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
+					#endif
+
+					v.vertex.xyz = data_1.xyz;
+					v.vertex.w = 1;
+
+					v.normal.x = data_1.w;
+					v.normal.yz = data_2.xy;
+
+					#ifdef _TANGENT_TO_WORLD
+						v.tangent.xy = data_2.zw;
+						v.tangent.z = data_3.x;
+					#endif
+				}
+			}
+
+			v2f_meta vertSkinnedMeta(VertexInputSkinningMeta vs)
+			{
+				vert(vs);
+
+				VertexInput v;
+				v.vertex = vs.vertex;
+				v.normal = vs.normal;
+				v.uv0 = vs.uv0;
+				v.uv1 = vs.uv1;
+
+				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+					v.uv2 = vs.uv2;
+				#endif
+
+				#ifdef _TANGENT_TO_WORLD
+					v.tangent = vs.tangent;
+				#endif
+
+				return vert_meta(v);
+			}
+
+			// ----- DQ modification end -----
+
+
             ENDCG
         }
     }
