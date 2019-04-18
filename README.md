@@ -59,7 +59,7 @@ I would also like to hear about your projects that use my script and your experi
 
 ## API
 
-[Documentation](https://constantinerudenko.github.io/Docs/DQ-skinning-for-Unity/annotated.html)
+[Documentation](https://constantinerudenko.github.io/Docs/DQ-skinning-for-Unity/index.html)
 
 ## Known bugs
 
