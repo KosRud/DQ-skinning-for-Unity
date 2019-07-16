@@ -10,7 +10,8 @@
 /// <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> is required to extract some information about the mesh during <b>Start()</b> and is destroyed immediately after. 
 /// </summary>
 [RequireComponent(typeof(MeshFilter))]
-public class DualQuaternionSkinner : MonoBehaviour {
+public class DualQuaternionSkinner : MonoBehaviour
+{
 
 	struct DualQuaternion
 	{
@@ -31,11 +32,9 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		public float weight3;
 	}
 
-	DualQuaternion[] poseDualQuaternions;
-	
-	const int numthreads = 1024;	// must be same in compute shader code
+	const int numthreads = 1024;    // must be same in compute shader code
 	const int textureWidth = 1024;  // no need to adjust compute shaders
-	
+
 	public ComputeShader shaderComputeBoneDQ;
 	public ComputeShader shaderDQBlend;
 	public ComputeShader shaderApplyMorph;
@@ -46,7 +45,10 @@ public class DualQuaternionSkinner : MonoBehaviour {
 	/// </summary>
 	public bool started { get; private set; } = false;
 
-	ComputeBuffer bufPoseDq;
+	DualQuaternion[] poseDualQuaternions;
+	Matrix4x4[] poseMatrices;
+
+	ComputeBuffer bufPoseMatrices;
 	ComputeBuffer bufSkinnedDq;
 	ComputeBuffer bufOriginalVertices;
 	ComputeBuffer bufOriginalNormals;
@@ -232,7 +234,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 			{
 				// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
 				// https://developer.nvidia.com/content/understanding-structured-buffer-performance
-				this.arrBufMorphDeltaTangents[i] = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) *  4);
+				this.arrBufMorphDeltaTangents[i] = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 4);
 				for (int k = 0; k < this.mf.mesh.vertexCount; k++)
 					tempVec4[k] = deltaTangents[k];
 				this.arrBufMorphDeltaTangents[i].SetData(tempVec4);
@@ -254,6 +256,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		this.shaderDQBlend.SetInt("textureWidth", textureWidth);
 
 		this.poseDualQuaternions = new DualQuaternion[this.mf.mesh.bindposes.Length];
+		this.poseMatrices = new Matrix4x4[this.mf.mesh.bindposes.Length];
 
 		// initiate textures and buffers
 
@@ -281,8 +284,8 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		this.rtSkinnedData_3.Create();
 		this.shaderDQBlend.SetTexture(this.kernelHandleComputeBoneDQ, "skinned_data_3", this.rtSkinnedData_3);
 
-		this.bufPoseDq = new ComputeBuffer(this.mf.mesh.bindposes.Length, sizeof(float) * 8);
-		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "pose_dual_quaternions", this.bufPoseDq);
+		this.bufPoseMatrices = new ComputeBuffer(this.mf.mesh.bindposes.Length, sizeof(float) * 16);
+		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "pose_matrices", this.bufPoseMatrices);
 
 		this.bufSkinnedDq = new ComputeBuffer(this.mf.mesh.bindposes.Length, sizeof(float) * 8);
 		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "skinned_dual_quaternions", this.bufSkinnedDq);
@@ -442,7 +445,7 @@ public class DualQuaternionSkinner : MonoBehaviour {
 		this.bufOriginalNormals?.Release();
 		this.bufOriginalVertices?.Release();
 		this.bufOriginalTangents?.Release();
-		this.bufPoseDq?.Release();
+		this.bufPoseMatrices?.Release();
 		this.bufSkinnedDq?.Release();
 		this.bufMorphedNormals?.Release();
 		this.bufMorphedVertices?.Release();
@@ -464,13 +467,13 @@ public class DualQuaternionSkinner : MonoBehaviour {
 
 	void OnDestroy()
 	{
-		this.ReleaseBuffers();	
+		this.ReleaseBuffers();
 	}
 
 	// Use this for initialization
 	void Start()
 	{
-		this.shaderComputeBoneDQ = (ComputeShader)Instantiate(this.shaderComputeBoneDQ);	// bug workaround
+		this.shaderComputeBoneDQ = (ComputeShader)Instantiate(this.shaderComputeBoneDQ);    // bug workaround
 		this.shaderDQBlend = (ComputeShader)Instantiate(this.shaderDQBlend);                // bug workaround
 		this.shaderApplyMorph = (ComputeShader)Instantiate(this.shaderApplyMorph);          // bug workaround
 
@@ -502,35 +505,16 @@ public class DualQuaternionSkinner : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
+	void Update()
+	{
 		this.ApplyAllMorphs();
 
-		this.mf.mesh.MarkDynamic ();    // once or every frame? idk.
-										// at least it does not affect performance
+		this.mf.mesh.MarkDynamic();    // once or every frame? idk.
+									   // at least it does not affect performance
 
-		this.shaderComputeBoneDQ.SetVector(
-			"parent_rotation_quaternion",
-			Quaternion.Inverse(this.transform.parent.rotation).ToVector4()
-		);
-
-		this.shaderComputeBoneDQ.SetVector (
-			"parent_translation_quaternion", 
-			new Vector4(
-				- this.transform.parent.position.x,
-				- this.transform.parent.position.y,
-				- this.transform.parent.position.z,
-				1
-			)
-		);
-
-		this.shaderComputeBoneDQ.SetVector(
-			"parent_scale",
-			new Vector4(
-				this.transform.parent.lossyScale.x,
-				this.transform.parent.lossyScale.y,
-				this.transform.parent.lossyScale.z,
-				1
-			)
+		this.shaderComputeBoneDQ.SetMatrix(
+			"self_matrix",
+			this.transform.worldToLocalMatrix
 		);
 
 		for (int i = 0; i < this.bones.Length; i++)
@@ -541,17 +525,24 @@ public class DualQuaternionSkinner : MonoBehaviour {
 
 			// could use float3 instead of float4 for position but NVidia says structures not aligned to 128 bits are slow
 			// https://developer.nvidia.com/content/understanding-structured-buffer-performance
-			this.poseDualQuaternions[i].position = new Vector4(pos.x, pos.y, pos.z, 1);
-		}
+			this.poseDualQuaternions[i].position = new Vector4(
+				pos.x,
+				pos.y,
+				pos.z,
+				0
+			);
 
-		this.bufPoseDq.SetData(this.poseDualQuaternions);
+			this.poseMatrices[i] = this.bones[i].localToWorldMatrix;
+		}
+		
+		this.bufPoseMatrices.SetData(this.poseMatrices);
 
 		// Calculate blended quaternions
 
 		int numThreadGroups = this.bones.Length / numthreads;
 		if (this.bones.Length % numthreads != 0)
 		{
-			numThreadGroups ++;
+			numThreadGroups++;
 		}
 
 		this.shaderComputeBoneDQ.Dispatch(this.kernelHandleDQBlend, numThreadGroups, 1, 1);

@@ -41,3 +41,27 @@ struct dual_quaternion DualQuaternionShortestPath(struct dual_quaternion dq1, st
 	dq1.translation_quaternion	= isBadPath ? -dq1.translation_quaternion	: dq1.translation_quaternion;
 	return dq1;
 }
+
+float4 QuaternionApplyRotation(float4 v, float4 rotQ)
+{
+	v = QuaternionMultiply(rotQ, v);
+	return QuaternionMultiply(v, QuaternionInvert(rotQ));
+}
+
+struct dual_quaternion DualQuaternionFromMatrix4x4(float4x4 m)
+{
+	struct  dual_quaternion dq;
+
+	dq.rotation_quaternion.w = sqrt(m[0][0] + m[1][1] + m[2][2] + 1.0)*0.5;	// assume m[3][3] = 1.0
+
+	float w4 = dq.rotation_quaternion.w * 4.0;
+
+	dq.rotation_quaternion.x = (m[2][1] - m[1][2]) / w4;
+	dq.rotation_quaternion.y = (m[0][2] - m[2][0]) / w4;
+	dq.rotation_quaternion.z = (m[1][0] - m[0][1]) / w4;
+
+	dq.translation_quaternion = float4(m[0][3], m[1][3], m[2][3], 0);
+	dq.translation_quaternion = QuaternionMultiply(dq.translation_quaternion, dq.rotation_quaternion) * 0.5;
+
+	return dq;
+}
