@@ -3,10 +3,6 @@
 
 #include "DQ.cginc"
 
-float4 parent_rotation_quaternion;
-float4 parent_translation_quaternion;
-float4 parent_scale;
-
 struct boneWeight
 {
 	int boneIndex0;
@@ -20,34 +16,26 @@ struct boneWeight
 	float boneWeight3;
 };
 
-RWStructuredBuffer<dual_quaternion> pose_dual_quaternions;
+RWStructuredBuffer<float4x4> pose_matrices;
+float4x4 self_matrix;
+
 RWStructuredBuffer<dual_quaternion> bind_dual_quaternions;
 RWStructuredBuffer<dual_quaternion> skinned_dual_quaternions;
 
 [numthreads(1024,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-	struct dual_quaternion dq_parent;
-	struct dual_quaternion dq_pose;
 	struct dual_quaternion dq_bind;
+	dq_bind.rotation_quaternion	= bind_dual_quaternions.Load(id.x).rotation_quaternion;
+	dq_bind.translation_quaternion = bind_dual_quaternions.Load(id.x).translation_quaternion;
+	dq_bind.translation_quaternion = QuaternionMultiply(dq_bind.translation_quaternion,	dq_bind.rotation_quaternion) * 0.5;
 
-	dq_parent	.rotation_quaternion = parent_rotation_quaternion;
-	dq_pose		.rotation_quaternion = pose_dual_quaternions.Load(id.x).rotation_quaternion;
-	dq_bind		.rotation_quaternion = bind_dual_quaternions.Load(id.x).rotation_quaternion;
+	float4x4 pose_matrix = transpose(pose_matrices.Load(id.x));
+	pose_matrix = mul(self_matrix, pose_matrix);
 
-	dq_parent	.translation_quaternion = parent_translation_quaternion;
-	dq_pose		.translation_quaternion = pose_dual_quaternions.Load(id.x).translation_quaternion;
-	dq_bind		.translation_quaternion = bind_dual_quaternions.Load(id.x).translation_quaternion;
-
-	dq_parent	.translation_quaternion = QuaternionMultiply(dq_parent	.rotation_quaternion,		dq_parent	.translation_quaternion	) * 0.5;
-	dq_pose		.translation_quaternion = QuaternionMultiply(dq_pose	.translation_quaternion,	dq_pose		.rotation_quaternion	) * 0.5;
-	dq_bind		.translation_quaternion = QuaternionMultiply(dq_bind	.translation_quaternion,	dq_bind		.rotation_quaternion	) * 0.5;
-
-	struct dual_quaternion dq_skinned = DualQuaternionMultiply(dq_parent, dq_pose);
+	struct dual_quaternion dq_pose = DualQuaternionFromMatrix4x4(pose_matrix);
 	
-	dq_skinned.translation_quaternion /= parent_scale;
-	
-	dq_skinned = DualQuaternionMultiply(dq_skinned, dq_bind);
+	struct dual_quaternion dq_skinned = DualQuaternionMultiply(dq_pose, dq_bind);
 
 	skinned_dual_quaternions[id.x].rotation_quaternion		= dq_skinned.rotation_quaternion;
 	skinned_dual_quaternions[id.x].translation_quaternion	= dq_skinned.translation_quaternion;
