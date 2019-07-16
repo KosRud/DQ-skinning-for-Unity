@@ -67,6 +67,9 @@ public class DualQuaternionSkinner : MonoBehaviour
 	float[] morphWeights;
 
 	MeshFilter mf;
+	MeshRenderer mr;
+
+	MaterialPropertyBlock materialPropertyBlock;
 
 	Transform[] bones;
 
@@ -241,14 +244,14 @@ public class DualQuaternionSkinner : MonoBehaviour
 			}
 		}
 
-		MeshRenderer mr = this.gameObject.GetComponent<MeshRenderer>();
-		if (mr == null)
-			mr = this.gameObject.AddComponent<MeshRenderer>();
+		this.mr = this.gameObject.GetComponent<MeshRenderer>();
+		if (this.mr == null)
+			this.mr = this.gameObject.AddComponent<MeshRenderer>();
 
-		mr.materials = this.materials;  // bug workaround
-		this.materials = mr.materials;  // bug workaround
+		this.mr.materials = this.materials;  // bug workaround
+		this.materials = this.mr.materials;  // bug workaround
 
-		foreach (Material m in mr.materials)
+		foreach (Material m in this.mr.materials)
 		{
 			m.SetInt("_DoSkinning", 1);
 		}
@@ -473,6 +476,8 @@ public class DualQuaternionSkinner : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
+		this.materialPropertyBlock = new MaterialPropertyBlock();
+
 		this.shaderComputeBoneDQ = (ComputeShader)Instantiate(this.shaderComputeBoneDQ);    // bug workaround
 		this.shaderDQBlend = (ComputeShader)Instantiate(this.shaderDQBlend);                // bug workaround
 		this.shaderApplyMorph = (ComputeShader)Instantiate(this.shaderApplyMorph);          // bug workaround
@@ -555,14 +560,12 @@ public class DualQuaternionSkinner : MonoBehaviour
 
 		this.shaderDQBlend.Dispatch(this.kernelHandleDQBlend, numThreadGroups, 1, 1);
 
-		foreach (Material m in this.materials)
-		{
-			m.SetTexture("skinned_data_1", this.rtSkinnedData_1);
-			m.SetTexture("skinned_data_2", this.rtSkinnedData_2);
-			m.SetTexture("skinned_data_3", this.rtSkinnedData_3);
-			m.SetInt("skinned_tex_height", this.mf.mesh.vertexCount / textureWidth);
-			m.SetInt("skinned_tex_width", textureWidth);
-		}
+		this.materialPropertyBlock.SetTexture("skinned_data_1", this.rtSkinnedData_1);
+		this.materialPropertyBlock.SetTexture("skinned_data_2", this.rtSkinnedData_2);
+		this.materialPropertyBlock.SetTexture("skinned_data_3", this.rtSkinnedData_3);
+		this.materialPropertyBlock.SetInt("skinned_tex_height", this.mf.mesh.vertexCount / textureWidth);
+		this.materialPropertyBlock.SetInt("skinned_tex_width", textureWidth);
+		this.mr.SetPropertyBlock(this.materialPropertyBlock);
 	}
 }
 
