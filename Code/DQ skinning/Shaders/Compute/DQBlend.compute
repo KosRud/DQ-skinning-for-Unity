@@ -33,7 +33,7 @@ float3 SkinVertex(float3 original_vector, int index)
 	float4 boneWeights = bone_weights.Load(index).bone_weights;
 
 	struct dual_quaternion dq0 = skinned_dual_quaternions.Load(boneIndexes[0]);
-	struct dual_quaternion dq1= skinned_dual_quaternions.Load(boneIndexes[1]);
+	struct dual_quaternion dq1 = skinned_dual_quaternions.Load(boneIndexes[1]);
 	struct dual_quaternion dq2 = skinned_dual_quaternions.Load(boneIndexes[2]);
 	struct dual_quaternion dq3 = skinned_dual_quaternions.Load(boneIndexes[3]);
 
