@@ -3,14 +3,38 @@
 
 #include "DQ.cginc"
 
-RWStructuredBuffer<float4> source;
-RWStructuredBuffer<float4> target;
-RWStructuredBuffer<float4> delta;
+struct vertex_info
+{
+	float4 position;
+	float4 normal;
+	float4 tangent;
+
+	int4 bone_indexes;
+	float4 bone_weights;
+};
+
+struct morph_delta
+{
+	float4 position;
+	float4 normal;
+	float4 tangent;
+};
+
+RWStructuredBuffer<vertex_info> source;
+RWStructuredBuffer<vertex_info> target;
+RWStructuredBuffer<morph_delta> delta;
 
 float weight;
 
 [numthreads(1024, 1, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-	target[id.x] = source.Load(id.x) + delta.Load(id.x) * weight;
+	struct vertex_info vertinfo = source.Load(id.x);
+	struct vertex_info delta = source.Load(id.x);
+
+	vertinfo.position	+= delta.position	* weight;
+	vertinfo.normal		+= delta.normal		* weight;
+	vertinfo.tangent	+= delta.tangent	* weight;
+
+	target[id.x] = vertinfo;
 }
