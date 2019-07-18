@@ -75,7 +75,6 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 	int2 pos;
-
 	pos.x = id.x % textureWidth;
 	pos.y = id.x / textureWidth;
 

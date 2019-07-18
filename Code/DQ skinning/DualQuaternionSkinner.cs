@@ -331,7 +331,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 	{
 		this.shaderDQBlend.SetBuffer(
 			this.kernelHandleComputeBoneDQ,
-			"original_vertices",
+			"vertex_infos",
 			this.ApplyMorphs(
 				this.bufVertInfo,
 				ref this.bufMorphedVertInfo,
