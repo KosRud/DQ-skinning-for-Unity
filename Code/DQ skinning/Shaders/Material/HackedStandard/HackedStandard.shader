@@ -165,7 +165,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
 					#ifdef _TANGENT_TO_WORLD
 						v.tangent.xy = data_2.zw;
-						v.tangent.z = data_3.x;
+						v.tangent.zw = data_3.xy;
 					#endif
 				}
 			}
@@ -292,7 +292,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
 					#ifdef _TANGENT_TO_WORLD
 						v.tangent.xy = data_2.zw;
-						v.tangent.z = data_3.x;
+						v.tangent.zw = data_3.xy;
 					#endif
 				}
 			}
@@ -395,7 +395,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
 					#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
 						v.tangent.xy = data_2.zw;
-						v.tangent.z = data_3.x;
+						v.tangent.zw = data_3.xy;
 					#endif
 				}
 			}
@@ -528,7 +528,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
 					#ifdef _TANGENT_TO_WORLD
 						v.tangent.xy = data_2.zw;
-						v.tangent.z = data_3.x;
+						v.tangent.zw = data_3.xy;
 					#endif
 				}
 			}
@@ -634,7 +634,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
 					#ifdef _TANGENT_TO_WORLD
 						v.tangent.xy = data_2.zw;
-						v.tangent.z = data_3.x;
+						v.tangent.zw = data_3.xy;
 					#endif
 				}
 			}
@@ -757,7 +757,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
 					#ifdef _TANGENT_TO_WORLD
 						v.tangent.xy = data_2.zw;
-						v.tangent.z = data_3.x;
+						v.tangent.zw = data_3.xy;
 					#endif
 				}
 			}
@@ -886,7 +886,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
 					#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
 						v.tangent.xy = data_2.zw;
-						v.tangent.z = data_3.x;
+						v.tangent.zw = data_3.xy;
 					#endif
 				}
 			}
