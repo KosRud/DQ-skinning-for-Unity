@@ -92,7 +92,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 		layout is as such:
 			rtSkinnedData_1			float4			vertex.xyz,	normal.x
 			rtSkinnedData_2			float4			normal.yz,	tangent.xy
-			rtSkinnedData_3			float			tangent.z
+			rtSkinnedData_3			float2			tangent.zw
 	*/
 	RenderTexture rtSkinnedData_1;
 	RenderTexture rtSkinnedData_2;
@@ -270,7 +270,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.rtSkinnedData_2.Create();
 		this.shaderDQBlend.SetTexture(this.kernelHandleComputeBoneDQ, "skinned_data_2", this.rtSkinnedData_2);
 
-		this.rtSkinnedData_3 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.RFloat);
+		this.rtSkinnedData_3 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.RGFloat);
 		this.rtSkinnedData_3.filterMode = FilterMode.Point;
 		this.rtSkinnedData_3.enableRandomWrite = true;
 		this.rtSkinnedData_3.Create();

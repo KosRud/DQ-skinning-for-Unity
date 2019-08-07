@@ -27,7 +27,7 @@ RWStructuredBuffer<vertex_info> vertex_infos;
 uint textureWidth;
 RWTexture2D<float4> skinned_data_1;
 RWTexture2D<float4> skinned_data_2;
-RWTexture2D<float> skinned_data_3;
+RWTexture2D<float2> skinned_data_3;
 
 
 
@@ -84,5 +84,5 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
 	skinned_data_1[pos] = float4(vertinfo.position.xyz, vertinfo.normal.x);
 	skinned_data_2[pos] = float4(vertinfo.normal.yz, vertinfo.tangent.xy);
-	skinned_data_3[pos] = vertinfo.tangent.z;
+	skinned_data_3[pos] = vertinfo.tangent.zw;
 }
