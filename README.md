@@ -19,7 +19,9 @@ The scipt only works in play mode.<br>
 If you see no effect in play mode verify that you are using the right shader.
 
 ## Unity version
-The script was developed for Unity **2018.3.3.f1**. Other versions may refuse to compile `HackedStandard.shader` as the Standard shader changes from version to version and compatibility is not guaranteed.
+The script was tested with following Unity versions:
+* **2018.3.3.f1**
+* **2019.1.9f1**
 
 ## Performance:
 
