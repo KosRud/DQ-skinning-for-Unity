@@ -114,8 +114,11 @@ public class DualQuaternionSkinner : MonoBehaviour
 	{
 		float[] weights = new float[this.morphWeights.Length];
 		for (int i = 0; i < weights.Length; i++)
-			weights[i] = this.morphWeights[i] * 100f;
-		return weights;
+        {
+            weights[i] = this.morphWeights[i] * 100f;
+        }
+
+        return weights;
 	}
 
 	/// <summary>
@@ -127,15 +130,19 @@ public class DualQuaternionSkinner : MonoBehaviour
 	public void SetBlendShapeWeights(float[] weights)
 	{
 		if (weights.Length != this.morphWeights.Length)
-			throw new System.ArgumentException(
+        {
+            throw new System.ArgumentException(
 				"An array of weights must contain the number of elements " +
 				$"equal to the number of available blendshapes. Currently " +
 				$"{this.morphWeights.Length} blendshapes ara available but {weights.Length} weights were passed."
 			);
+        }
 
-		for (int i = 0; i < weights.Length; i++)
-			this.morphWeights[i] = weights[i] / 100f;
-	}
+        for (int i = 0; i < weights.Length; i++)
+        {
+            this.morphWeights[i] = weights[i] / 100f;
+        }
+    }
 
 	/// <summary>
 	/// Set weight for the blend shape with given index.
@@ -153,9 +160,11 @@ public class DualQuaternionSkinner : MonoBehaviour
 		}
 
 		if (index < 0 || index >= this.morphWeights.Length)
-			throw new System.IndexOutOfRangeException("Blend shape index out of range");
+        {
+            throw new System.IndexOutOfRangeException("Blend shape index out of range");
+        }
 
-		this.morphWeights[index] = weight / 100f;
+        this.morphWeights[index] = weight / 100f;
 	}
 
 	/// <summary>
@@ -166,12 +175,16 @@ public class DualQuaternionSkinner : MonoBehaviour
 	public float GetBlendShapeWeight(int index)
 	{
 		if (this.started == false)
-			return this.GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(index);
+        {
+            return this.GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(index);
+        }
 
-		if (index < 0 || index >= this.morphWeights.Length)
-			throw new System.IndexOutOfRangeException("Blend shape index out of range");
+        if (index < 0 || index >= this.morphWeights.Length)
+        {
+            throw new System.IndexOutOfRangeException("Blend shape index out of range");
+        }
 
-		return this.morphWeights[index] * 100f;
+        return this.morphWeights[index] * 100f;
 	}
 
 	/// <summary>
@@ -185,17 +198,21 @@ public class DualQuaternionSkinner : MonoBehaviour
 		get
 		{
 			if (this.started == false)
-				return this.GetComponent<SkinnedMeshRenderer>().sharedMesh;
+            {
+                return this.GetComponent<SkinnedMeshRenderer>().sharedMesh;
+            }
 
-			return this.mf.mesh;
+            return this.mf.mesh;
 		}
 
 		set
 		{
 			if (this.started == false)
-				throw new System.InvalidOperationException("DualQuaternion.Skinner.mesh can only be assigned to after Awake() was called");
+            {
+                throw new System.InvalidOperationException("DualQuaternion.Skinner.mesh can only be assigned to after Awake() was called");
+            }
 
-			this.mf.mesh = value;
+            this.mf.mesh = value;
 
 			this.SetMesh(value);
 		}
@@ -235,9 +252,11 @@ public class DualQuaternionSkinner : MonoBehaviour
 
 		this.mr = this.gameObject.GetComponent<MeshRenderer>();
 		if (this.mr == null)
-			this.mr = this.gameObject.AddComponent<MeshRenderer>();
+        {
+            this.mr = this.gameObject.AddComponent<MeshRenderer>();
+        }
 
-		this.mr.materials = this.materials;  // bug workaround
+        this.mr.materials = this.materials;  // bug workaround
 		this.materials = this.mr.materials;  // bug workaround
 
 		foreach (Material m in this.mr.materials)
@@ -258,22 +277,28 @@ public class DualQuaternionSkinner : MonoBehaviour
 			textureHeight++;
 		}
 
-		this.rtSkinnedData_1 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat);
-		this.rtSkinnedData_1.filterMode = FilterMode.Point;
-		this.rtSkinnedData_1.enableRandomWrite = true;
-		this.rtSkinnedData_1.Create();
+        this.rtSkinnedData_1 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat)
+        {
+            filterMode = FilterMode.Point,
+            enableRandomWrite = true
+        };
+        this.rtSkinnedData_1.Create();
 		this.shaderDQBlend.SetTexture(this.kernelHandleComputeBoneDQ, "skinned_data_1", this.rtSkinnedData_1);
 
-		this.rtSkinnedData_2 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat);
-		this.rtSkinnedData_2.filterMode = FilterMode.Point;
-		this.rtSkinnedData_2.enableRandomWrite = true;
-		this.rtSkinnedData_2.Create();
+        this.rtSkinnedData_2 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat)
+        {
+            filterMode = FilterMode.Point,
+            enableRandomWrite = true
+        };
+        this.rtSkinnedData_2.Create();
 		this.shaderDQBlend.SetTexture(this.kernelHandleComputeBoneDQ, "skinned_data_2", this.rtSkinnedData_2);
 
-		this.rtSkinnedData_3 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.RGFloat);
-		this.rtSkinnedData_3.filterMode = FilterMode.Point;
-		this.rtSkinnedData_3.enableRandomWrite = true;
-		this.rtSkinnedData_3.Create();
+        this.rtSkinnedData_3 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.RGFloat)
+        {
+            filterMode = FilterMode.Point,
+            enableRandomWrite = true
+        };
+        this.rtSkinnedData_3.Create();
 		this.shaderDQBlend.SetTexture(this.kernelHandleComputeBoneDQ, "skinned_data_3", this.rtSkinnedData_3);
 
 		this.bufPoseMatrices = new ComputeBuffer(this.mf.mesh.bindposes.Length, sizeof(float) * 16);
@@ -282,8 +307,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.bufSkinnedDq = new ComputeBuffer(this.mf.mesh.bindposes.Length, sizeof(float) * 8);
 		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "skinned_dual_quaternions", this.bufSkinnedDq);
 		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "skinned_dual_quaternions", this.bufSkinnedDq);
-		
-		
+
 		this.bufVertInfo = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 16 + sizeof(int) * 4);
 		var vertInfos = new VertexInfo[this.mf.mesh.vertexCount];
 		Vector3[] vertices = this.mf.mesh.vertices;
@@ -349,12 +373,16 @@ public class DualQuaternionSkinner : MonoBehaviour
 		for (int i = 0; i < weights.Length; i++)
 		{
 			if (weights[i] == 0)
-				continue;
+            {
+                continue;
+            }
 
-			if (arrBufDelta[i] == null)
-				continue;
+            if (arrBufDelta[i] == null)
+            {
+                continue;
+            }
 
-			this.shaderApplyMorph.SetBuffer(this.kernelHandleApplyMorph, "source", bufSource);
+            this.shaderApplyMorph.SetBuffer(this.kernelHandleApplyMorph, "source", bufSource);
 			this.shaderApplyMorph.SetBuffer(this.kernelHandleApplyMorph, "target", bufTarget);
 			this.shaderApplyMorph.SetBuffer(this.kernelHandleApplyMorph, "delta", arrBufDelta[i]);
 			this.shaderApplyMorph.SetFloat("weight", weights[i]);
@@ -373,9 +401,11 @@ public class DualQuaternionSkinner : MonoBehaviour
 		}
 
 		if (bufSource == bufOriginal)
-			return bufOriginal;
+        {
+            return bufOriginal;
+        }
 
-		bufSource = bufTarget;
+        bufSource = bufTarget;
 		bufTarget = bufTemp;
 		bufTemp = bufSource;
 

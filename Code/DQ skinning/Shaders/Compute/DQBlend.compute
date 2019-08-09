@@ -19,8 +19,6 @@ struct vertex_info
 	float4 bone_weights;
 };
 
-bool _OnlyRotation;
-
 RWStructuredBuffer<dual_quaternion> skinned_dual_quaternions;
 RWStructuredBuffer<vertex_info> vertex_infos;
 
@@ -28,8 +26,6 @@ uint textureWidth;
 RWTexture2D<float4> skinned_data_1;
 RWTexture2D<float4> skinned_data_2;
 RWTexture2D<float2> skinned_data_3;
-
-
 
 struct vertex_info SkinVertex(struct vertex_info vertinfo)
 {
