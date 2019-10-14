@@ -224,7 +224,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 	{
 		this.ReleaseBuffers();
 
-		mesh.bounds = new Bounds(Vector3.zero, new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity)); // ToDo: avoid dirty hack
+		mesh.bounds = new Bounds(Vector3.zero, new Vector3(1000000f, 1000000f, 1000000f)); // ToDo: avoid dirty hack
 
 		this.mf.mesh = mesh;
 
