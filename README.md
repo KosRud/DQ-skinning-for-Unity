@@ -20,8 +20,7 @@ If you see no effect in play mode verify that you are using the right shader.
 
 ## Unity version
 The script was tested with following Unity versions:
-* **2019.1.9f1**
-* **2019.2.0f1**
+* **2019.2.9f1**
 
 ## Performance:
 
