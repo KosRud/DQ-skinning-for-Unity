@@ -24,11 +24,11 @@ The script was tested with following Unity versions:
 
 ## Performance:
 
-During my testing the amount of time spent on actual skinning was negligible compared to the amount of time extracting `transform.position` and `transform.rotation` from every bone in the hierarchy.
+During my testing the amount of time spent on actual skinning was negligible compared to the amount of time extracting `localToWorldMatrix` from every bone in the hierarchy.
 
 As long as you are not creating hundreds of characters with complex rigs (no matter the polycount) there should be no significant performance hit.
 
-If anyone knows how to optimize extracting position and rotation of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on the [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
+If anyone knows how to optimize extracting `localToWorldMatrix` of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on the [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
 
 ## How to set up:
 
