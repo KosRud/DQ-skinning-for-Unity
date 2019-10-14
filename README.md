@@ -33,11 +33,17 @@ If anyone knows how to optimize extracting position and rotation of the bones pl
 
 ## How to set up:
 
-* Create a normal skinned character with `SkinnedMeshRenderer` component
+* Create a skinned character with `SkinnedMeshRenderer` component
 * Add `DualQuaternionSkinner.cs` component (it will require a `MeshFilter` component)
-* All materials of the mesh should use special shader to apply vertex positions
+* Enable mesh Read/Write in import settings
+<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Mesh import settings.png" width="463">
+* All materials of the mesh should use a special shader to apply vertex positions. The shader is `MadCake/Material/Standard hacked for DQ skinning`
 
-The shader is `MadCake/Material/Standard hacked for DQ skinning`
+## Common problems
+
+The script is programmed to automatically detect common setup problems. Check out the editor:
+
+<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Problems.png" width="413">
 
 ## Why do i need SkinnedMeshRenderer?
 
@@ -45,11 +51,9 @@ My scripts uses `SkinnedMeshRenderer` to extract an array of bones from it. Yep,
 The order of bones is unpredictable and does not depent on their hierarchy.<br>
 Only SkinnedMeshRenderer knows it &nbsp;&nbsp; ¯\\\_(ツ)\_/¯
 
-After extracting the bone array in `Start()` my script removes `SkinnedMeshRenderer` component as it is no longer needed.<br>
-All the animations are made by the script.<br>
-You can verify it in the editor after hitting play button.
+After extracting the bone array in `Start()` my script disables `SkinnedMeshRenderer` component as it is no longer needed. All the animations are performed by the script. You can verify it in the editor after hitting play button.
 
-## How do i use custom shaders?
+## How do I use custom shaders?
 
 Alas it's complicated.<br>
 I added comments to "Standard hacked for DQ skinning" marking the alterations i made to the Standard shader.<br>
@@ -63,6 +67,17 @@ I would also like to hear about your projects that use my script and your experi
 
 [Documentation](https://constantinerudenko.github.io/Docs/DQ-skinning-for-Unity/index.html)
 
+## Future plans
+
+* Fix known bugs/problems
+* I am currently working on a thesis about bulging compensation method for DQ skinning. Though I make no promises about it's availability.
+
 ## Known bugs
 
-When [Animator](https://docs.unity3d.com/ScriptReference/Animator.html).[cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) is set to anything other than **Always Animate**, it treats the mesh as if it is never visible. If you want to use animation culling, you will need to write a custom controller switching [Animator](https://docs.unity3d.com/ScriptReference/Animator.html).[cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) back and forth depending on object's visibility.
+* Mesh bounds are not working properly. For now I set the bounds to infinite so that the mesh is always visible.
+
+* Blend shapes are applied on every frame, even if weights did not change. This is not a bug, but there is no reason to loose time on needless calculations.
+
+## Discussion
+
+If you have any questions, ideas, bug reports, or just want to discuss the script, you can contact me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/)
