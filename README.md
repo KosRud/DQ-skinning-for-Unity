@@ -28,7 +28,7 @@ During my testing the amount of time spent on actual skinning was negligible com
 
 As long as you are not creating hundreds of characters with complex rigs (no matter the polycount) there should be no significant performance hit.
 
-If anyone knows how to optimize extracting `localToWorldMatrix` of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on the [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
+If anyone knows how to optimize extracting `localToWorldMatrix` of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
 
 ## How to set up:
 
