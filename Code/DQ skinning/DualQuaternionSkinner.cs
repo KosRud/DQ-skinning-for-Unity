@@ -10,6 +10,7 @@
 /// <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> is required to extract some information about the mesh during <b>Start()</b> and is destroyed immediately after. 
 /// </summary>
 [RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(SkinnedMeshRenderer))]
 public class DualQuaternionSkinner : MonoBehaviour
 {
 	struct VertexInfo
@@ -78,6 +79,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 
 	MeshFilter mf;
 	MeshRenderer mr;
+	SkinnedMeshRenderer smr;
 
 	MaterialPropertyBlock materialPropertyBlock;
 
@@ -221,6 +223,8 @@ public class DualQuaternionSkinner : MonoBehaviour
 	void SetMesh(Mesh mesh)
 	{
 		this.ReleaseBuffers();
+
+		mesh.bounds = new Bounds(Vector3.zero, new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity)); // ToDo: avoid dirty hack
 
 		this.mf.mesh = mesh;
 
@@ -445,30 +449,24 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.shaderDQBlend = (ComputeShader)Instantiate(this.shaderDQBlend);                // bug workaround
 		this.shaderApplyMorph = (ComputeShader)Instantiate(this.shaderApplyMorph);          // bug workaround
 
-		SkinnedMeshRenderer smr = this.gameObject.GetComponent<SkinnedMeshRenderer>();
+		this.smr = this.gameObject.GetComponent<SkinnedMeshRenderer>();
 		this.mf = this.GetComponent<MeshFilter>();
 
 		this.kernelHandleComputeBoneDQ = this.shaderComputeBoneDQ.FindKernel("CSMain");
 		this.kernelHandleDQBlend = this.shaderDQBlend.FindKernel("CSMain");
 		this.kernelHandleApplyMorph = this.shaderApplyMorph.FindKernel("CSMain");
 
-		if (smr == null)
-		{
-			throw new System.Exception("DualQuaternionSkinner requires skinned mesh renderer. It is used to extract some parameters and removed on start.");
-		}
+		this.materials = this.smr.materials;
+		this.bones = this.smr.bones;
 
-		this.materials = smr.materials;
-		this.bones = smr.bones;
-
-		this.SetMesh(smr.sharedMesh);
+		this.SetMesh(this.smr.sharedMesh);
 
 		for (int i = 0; i < this.morphWeights.Length; i++)
 		{
-			this.morphWeights[i] = smr.GetBlendShapeWeight(i) / 100f;
+			this.morphWeights[i] = this.smr.GetBlendShapeWeight(i) / 100f;
 		}
 
-		Destroy(smr);
-
+		this.smr.enabled = false;
 		this.started = true;
 	}
 
