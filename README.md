@@ -74,7 +74,7 @@ I would also like to hear about your projects that use my script and your experi
 
 ## Known bugs
 
-* Mesh bounds are not working properly. For now I set the bounds to infinite so that the mesh is always visible.
+* Mesh bounds are not working properly. For now I set the bounds to 1000000f so that the mesh is always visible (infinite causes an error).
 
 * Blend shapes are applied on every frame, even if weights did not change. This is not a bug, but there is no reason to loose time on needless calculations.
 
