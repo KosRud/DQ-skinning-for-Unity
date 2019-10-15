@@ -11,7 +11,7 @@
 
 |Gif|Difference|
 |----|----|
-|<img src="Screenshots/before-after.gif">|<img src="Screenshots/diff.png">|
+|<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/before-after.gif" width="400">|<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/diff.png" width="400">|
 
 # Warning:
 You will not see any effect in edit mode.<br>
@@ -34,7 +34,7 @@ If anyone knows how to optimize extracting `localToWorldMatrix` of the bones ple
 
 * Create a skinned character with `SkinnedMeshRenderer` component
 * Add `DualQuaternionSkinner.cs` component (it will require a `MeshFilter` component)
-* Enable mesh Read/Write in import settings
+* Enable mesh Read/Write in import settings<br>
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Mesh import settings.png" width="463">
 * All materials of the mesh should use a special shader to apply vertex positions. The shader is `MadCake/Material/Standard hacked for DQ skinning`
 
