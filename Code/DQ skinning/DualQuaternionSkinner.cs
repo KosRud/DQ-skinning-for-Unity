@@ -6,8 +6,6 @@
 /// Add this component to a <a class="bold" href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</a> that has <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> attached.<br>
 /// Do not remove <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> component!<br>
 /// Make sure that all materials of the animated object are using shader \"<b>MadCake/Material/Standard hacked for DQ skinning</b>\"
-/// 
-/// <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> is required to extract some information about the mesh during <b>Start()</b> and is destroyed immediately after. 
 /// </summary>
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(SkinnedMeshRenderer))]
