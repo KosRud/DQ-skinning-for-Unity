@@ -6,6 +6,7 @@
 * works with any platform that supports compute shaders
 * preserves volume with deformation (look comparison)
 * zero GC allocations per frame
+* original bulging compensation method (alpha)
 
 ### Comparison:
 
