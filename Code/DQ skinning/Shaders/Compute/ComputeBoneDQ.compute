@@ -22,6 +22,10 @@ float4x4 self_matrix;
 RWStructuredBuffer<dual_quaternion> bind_dual_quaternions;
 RWStructuredBuffer<dual_quaternion> skinned_dual_quaternions;
 
+RWStructuredBuffer<float4> bone_directions;
+
+float4 boneOrientation;
+
 [numthreads(1024,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
@@ -37,4 +41,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
 	skinned_dual_quaternions[id.x].rotation_quaternion		= dq_skinned.rotation_quaternion;
 	skinned_dual_quaternions[id.x].translation_quaternion	= dq_skinned.translation_quaternion;
+	
+	bone_directions[id.x] = QuaternionApplyRotation(boneOrientation, dq_pose.rotation_quaternion);
 }

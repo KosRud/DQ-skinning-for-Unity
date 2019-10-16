@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
+using System.Collections.Generic;
+
 /// <summary>
 /// Provides custom inspector for {@link DualQuaternionSkinner}
 /// </summary>
@@ -10,6 +12,7 @@ public class DualQuaternionSkinnerEditor : Editor
 	SerializedProperty shaderComputeBoneDQ;
 	SerializedProperty shaderDQBlend;
 	SerializedProperty shaderApplyMorph;
+	SerializedProperty bulgeCompensation;
 
 	DualQuaternionSkinner dqs;
 	SkinnedMeshRenderer smr
@@ -28,11 +31,22 @@ public class DualQuaternionSkinnerEditor : Editor
 
 	bool showBlendShapes = false;
 
+	enum BoneOrientation {X, Y, Z, negativeX, negativeY, negativeZ}
+	readonly Dictionary<BoneOrientation, Vector3> boneOrientationVectors = new Dictionary<BoneOrientation, Vector3>();
+
 	private void OnEnable()
 	{
 		this.shaderComputeBoneDQ	= this.serializedObject.FindProperty("shaderComputeBoneDQ");
 		this.shaderDQBlend			= this.serializedObject.FindProperty("shaderDQBlend");
 		this.shaderApplyMorph		= this.serializedObject.FindProperty("shaderApplyMorph");
+		this.bulgeCompensation		= this.serializedObject.FindProperty("bulgeCompensation");
+
+		this.boneOrientationVectors.Add(BoneOrientation.X, new Vector3(1,0,0));
+		this.boneOrientationVectors.Add(BoneOrientation.Y, new Vector3(0,1,0));
+		this.boneOrientationVectors.Add(BoneOrientation.Z, new Vector3(0,0,1));
+		this.boneOrientationVectors.Add(BoneOrientation.negativeX, new Vector3(-1,0,0));
+		this.boneOrientationVectors.Add(BoneOrientation.negativeY, new Vector3(0,-1,0));
+		this.boneOrientationVectors.Add(BoneOrientation.negativeZ, new Vector3(0,0,-1));
 	}
 
 	public override void OnInspectorGUI()
@@ -51,6 +65,28 @@ public class DualQuaternionSkinnerEditor : Editor
 			EditorGUILayout.LabelField(this.dqs.started ? "ON" : "OFF", GUILayout.Width(80));
 		EditorGUILayout.EndHorizontal();
 
+		EditorGUILayout.Space();
+
+		BoneOrientation currentOrientation = BoneOrientation.X;
+		foreach(BoneOrientation orientation in this.boneOrientationVectors.Keys)
+		{
+			if (this.dqs.boneOrientationVector == this.boneOrientationVectors[orientation])
+			{
+				currentOrientation = orientation;
+				break;
+			}
+		}
+		var newOrientation = (BoneOrientation)EditorGUILayout.EnumPopup("bone orientation: ", currentOrientation);
+		if (this.dqs.boneOrientationVector != this.boneOrientationVectors[newOrientation])
+		{
+			this.dqs.boneOrientationVector = this.boneOrientationVectors[newOrientation];
+			if (this.dqs.started)
+			{
+				this.dqs.UpdateMesh();
+			}
+		}
+
+		EditorGUILayout.PropertyField(this.bulgeCompensation);
 		EditorGUILayout.Space();
 
 		this.showBlendShapes = EditorGUILayout.Foldout(this.showBlendShapes, "Blend shapes");
