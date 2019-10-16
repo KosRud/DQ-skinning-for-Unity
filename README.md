@@ -6,7 +6,7 @@
 * works with any platform that supports compute shaders
 * preserves volume with deformation (look comparison)
 * zero GC allocations per frame
-* original bulging compensation method (alpha)
+* original bulging compensation method (alpha-testing, not ready for real-world applications yet)
 
 ### Comparison:
 
@@ -70,7 +70,7 @@ I would also like to hear about your projects that use my script and your experi
 ## Future plans
 
 * Fix known bugs/problems
-* New bulging compensation method (now in alpha)
+* Improve bulging compensation
 
 ## Known bugs
 
