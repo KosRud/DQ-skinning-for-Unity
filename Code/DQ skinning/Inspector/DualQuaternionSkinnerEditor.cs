@@ -76,7 +76,7 @@ public class DualQuaternionSkinnerEditor : Editor
 				break;
 			}
 		}
-		var newOrientation = (BoneOrientation)EditorGUILayout.EnumPopup("bone orientation: ", currentOrientation);
+		var newOrientation = (BoneOrientation)EditorGUILayout.EnumPopup("Bone orientation: ", currentOrientation);
 		if (this.dqs.boneOrientationVector != this.boneOrientationVectors[newOrientation])
 		{
 			this.dqs.boneOrientationVector = this.boneOrientationVectors[newOrientation];
