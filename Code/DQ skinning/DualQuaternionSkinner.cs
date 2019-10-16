@@ -17,6 +17,12 @@ public class DualQuaternionSkinner : MonoBehaviour
 	/// </summary>
 	public Vector3 boneOrientationVector;
 
+	/// <summary>
+	/// Only affects Play mode.
+	/// In Edit mode, SkinnedMeshRenderer is responsible for the culling.
+	/// </summary>
+	public bool ViewFrustrumCulling = true;
+
 	struct VertexInfo
 	{
 		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
@@ -58,20 +64,16 @@ public class DualQuaternionSkinner : MonoBehaviour
 	const int numthreads = 1024;    // must be same in compute shader code
 	const int textureWidth = 1024;  // no need to adjust compute shaders
 
-	[Range(0,1)]
 	/// <summary>
 	/// Adjusts the amount of bulge-compensation
 	/// </summary>
+	[Range(0,1)]
 	public float bulgeCompensation  = 0;
 
 	public ComputeShader shaderComputeBoneDQ;
 	public ComputeShader shaderDQBlend;
 	public ComputeShader shaderApplyMorph;
 
-	/// <summary>
-	/// Indicates whether Start( ) has already been called.<br>
-	/// When set to <b>true</b> indicates that <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a> component was already destroyed.
-	/// </summary>
 	public bool started { get; private set; } = false;
 
 	DualQuaternion[] poseDualQuaternions;
@@ -222,12 +224,12 @@ public class DualQuaternionSkinner : MonoBehaviour
             return this.mf.mesh;
         }
 
-        set => this.SetMesh(value);
+        private set => this.SetMesh(value);
     }
 
 	/// <summary>
 	/// Updates internal data
-	/// Call if the skinned mesh has been altered
+	/// Call if the skinned mesh has been altered while DualQuaternionSkinner is running
 	/// </summary>
     public void UpdateMesh() => this.SetMesh(this.mesh);
 
@@ -237,10 +239,17 @@ public class DualQuaternionSkinner : MonoBehaviour
 
 		if (this.started == false)
 		{
-			throw new System.InvalidOperationException("DualQuaternion.Skinner.mesh can only be assigned to after Awake() was called");
+			return;
 		}
 
-		mesh.bounds = new Bounds( Vector3.zero, 1000000f * Vector3.one );	// ToDo avoid using dirty hack;
+		if (this.ViewFrustrumCulling)
+		{
+			mesh.bounds = this.smr.localBounds;
+		}
+		else
+		{
+			mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000000);
+		}
 
 		this.mf.mesh = mesh;
 		this.bindPoses = mesh.bindposes;
