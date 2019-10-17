@@ -75,8 +75,6 @@ I would also like to hear about your projects that use my script and your experi
 
 ## Known bugs
 
-* Animation is calculated even when the mesh is outside view frustrum.
-
 * Blend shapes are applied on every frame, even if weights did not change. This is not a bug, but there is no reason to loose time on needless calculations.
 
 ## Discussion
