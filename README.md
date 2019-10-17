@@ -6,6 +6,7 @@
 * works with any platform that supports compute shaders
 * preserves volume with deformation (look comparison)
 * zero GC allocations per frame
+* original bulging compensation method (alpha-testing, not ready for real-world applications yet)
 
 ### Comparison:
 
@@ -69,11 +70,11 @@ I would also like to hear about your projects that use my script and your experi
 ## Future plans
 
 * Fix known bugs/problems
-* I am currently working on a thesis about bulging compensation method for DQ skinning. Though I make no promises about it's availability.
+* Improve bulging compensation
 
 ## Known bugs
 
-* Mesh bounds are not working properly. For now I set the bounds to 1000000f so that the mesh is always visible (infinite causes an error).
+* Animation is calculated even when the mesh is outside view frustrum.
 
 * Blend shapes are applied on every frame, even if weights did not change. This is not a bug, but there is no reason to loose time on needless calculations.
 
