@@ -67,8 +67,12 @@ public class DualQuaternionSkinnerEditor : Editor
 
 		EditorGUILayout.Space();
 
+		bool culling = this.dqs.ViewFrustrumCulling;
 		this.dqs.ViewFrustrumCulling = EditorGUILayout.Toggle("View frustrum culling: ", this.dqs.ViewFrustrumCulling);
-		this.dqs.UpdateMesh();
+		if (culling != this.dqs.ViewFrustrumCulling)
+		{
+			this.dqs.UpdateViewFrustrumCulling();
+		}
 
 		EditorGUILayout.Space();
 
@@ -85,7 +89,7 @@ public class DualQuaternionSkinnerEditor : Editor
 		if (this.dqs.boneOrientationVector != this.boneOrientationVectors[newOrientation])
 		{
 			this.dqs.boneOrientationVector = this.boneOrientationVectors[newOrientation];
-			this.dqs.UpdateMesh();
+			this.dqs.UpdatePerVertexCompensationCoef();
 		}
 
 		EditorGUILayout.PropertyField(this.bulgeCompensation);
