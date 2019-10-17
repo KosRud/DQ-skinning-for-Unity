@@ -91,7 +91,7 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 		}
 
 		//float angleCoef = saturate(2.0*sqrt(1.0 - rq.w));
-		float angleCoef = saturate(length(boneDir0 + boneDir1)) * 0.7;
+		float angleCoef = saturate(length(boneDir0 + boneDir1)) * 0.71;
 
 		float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);	// =0 if bones were aligned (twist only)
 		float3 offset = any(bisector) ? cross(axis, bisector) : 0;
@@ -99,7 +99,8 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 		//float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
 
 		float x = bone_weights[1];
-		float compensation = 1.89*x-6.65*x*x+6*x*x*x;
+		float compensation = 1.89*x-6.65*x*x+6*x*x*x;	// f(0.5) > 0, looks better but might cause overlapping in dense grometry
+		//float compensation = 1.89*x-6.78*x*x+6*x*x*x;	// f(0.5) = 0
 
 		compensation *= vertinfo.compensation_coef;
 		compensation *= compensation_coef;
