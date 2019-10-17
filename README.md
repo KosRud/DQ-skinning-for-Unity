@@ -69,13 +69,8 @@ I would also like to hear about your projects that use my script and your experi
 
 ## Future plans
 
-* Fix known bugs/problems
 * Test/fix/improve bulging compensation
 * It might make sense to group the data from all instances of the script into one batch and run the compute shaders only once per frame regardless of how many animated characters you have
-
-## Known bugs
-
-* Blend shapes are applied on every frame, even if weights did not change. This is not a bug, but there is no reason to loose time on needless calculations.
 
 ## Discussion
 
