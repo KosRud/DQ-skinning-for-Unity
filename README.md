@@ -72,6 +72,10 @@ I would also like to hear about your projects that use my script and your experi
 * Test/fix/improve bulging compensation
 * It might make sense to group the data from all instances of the script into one batch and run the compute shaders only once per frame regardless of how many animated characters you have
 
+## Known bugs / problems
+
+* Bulging compensation appears to make facial animation look a bit more stiff and robotic
+
 ## Discussion
 
 If you have any questions, ideas, bug reports, or just want to discuss the script, you can contact me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/)
