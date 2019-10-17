@@ -517,6 +517,11 @@ public class DualQuaternionSkinner : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if (this.mr.isVisible == false)
+		{
+			return;
+		}
+
 		this.shaderDQBlend.SetFloat("compensation_coef", this.bulgeCompensation);
 
 		this.ApplyAllMorphs();
