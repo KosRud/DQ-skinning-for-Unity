@@ -11,6 +11,8 @@ struct vertex_info
 
 	int4 bone_indexes;
 	float4 bone_weights;
+
+	float compensation_coef;
 };
 
 struct morph_delta
@@ -34,7 +36,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
 	vertinfo.position	+= morphinfo.position	* weight;
 	vertinfo.normal		+= morphinfo.normal		* weight;
-	vertinfo.tangent	+= morphinfo.tangent		* weight;
+	vertinfo.tangent	+= morphinfo.tangent	* weight;
 
 	target[id.x] = vertinfo;
 }
