@@ -105,6 +105,7 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 		compensation *= vertinfo.compensation_coef;
 		compensation *= compensation_coef;
 		compensation *= angleCoef;
+		compensation *= (1.0 - bone_weights[2] / bone_weights[1]);	// ToDo: try pow() to find best looking shape
 		
 		vertinfo.position.xyz += offset * compensation;
 	}
