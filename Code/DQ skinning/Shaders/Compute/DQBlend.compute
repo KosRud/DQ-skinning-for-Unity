@@ -90,22 +90,30 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 			boneDir1 *= -1;
 		}
 
-		//float angleCoef = saturate(2.0*sqrt(1.0 - rq.w));
-		float angleCoef = saturate(length(boneDir0 + boneDir1)) * 0.71;
+		//float angleCoef = saturate(2.0*sqrt(1.0 - rq.w));				// twisting should not increase coef, only bending
+		//float angleCoef = saturate(length(boneDir0 + boneDir1)) * 0.71;	// what if bones started at an angle?
+
+		rq.xyz *= dot(rq.xyz, axis);
+		rq = normalize(rq);
+		float angleCoef = saturate(2.0*sqrt(1.0 - rq.w));
+		// we don't need actual projected rotation, just the angle
+		// https://stackoverflow.com/questions/3684269/component-of-a-quaternion-rotation-around-an-axis
+		// http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition/
+		// http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition/forum.htm
+		// "Fiber Bundle Twist Reduction" Ken Shoemake in "Graphics Gems IV".
 
 		float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);	// =0 if bones were aligned (twist only)
 		float3 offset = any(bisector) ? cross(axis, bisector) : 0;
 
 		//float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
 
-		float x = bone_weights[1];
-		float compensation = 1.89*x-6.65*x*x+6*x*x*x;	// f(0.5) > 0, looks better but might cause overlapping in dense grometry
-		//float compensation = 1.89*x-6.78*x*x+6*x*x*x;	// f(0.5) = 0
+		float x = bone_weights[1] / (bone_weights[0] + bone_weights[1]);
+		float compensation = 1.89*x-6.78*x*x+6*x*x*x;	// f(0.5) = 0
 
 		compensation *= vertinfo.compensation_coef;
 		compensation *= compensation_coef;
 		compensation *= angleCoef;
-		compensation *= (1.0 - bone_weights[2] / bone_weights[1]);	// ToDo: try pow() to find best looking shape
+		compensation *= 1.0 - bone_weights[2] / bone_weights[1];
 		
 		vertinfo.position.xyz += offset * compensation;
 	}
