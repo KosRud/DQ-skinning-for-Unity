@@ -35,7 +35,7 @@ If anyone knows how to optimize extracting `localToWorldMatrix` of the bones ple
 
 * Create a skinned character with `SkinnedMeshRenderer` component
 * Add `DualQuaternionSkinner.cs` component (it will require a `MeshFilter` component)
-* Enable mesh Read/Write in import settings<br>
+* Enable mesh Read/Write in import settings
 
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Mesh import settings.png" width="463">
 
