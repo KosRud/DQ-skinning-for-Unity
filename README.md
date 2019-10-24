@@ -61,7 +61,7 @@ The script is programmed to automatically detect common setup problems. Check ou
 ## Why do i need SkinnedMeshRenderer?
 
 My scripts uses `SkinnedMeshRenderer` to extract an array of bones from it. Yep, that's it.<br>
-The order of bones is unpredictable and does not depent on their hierarchy.<br>
+The order of bones is unpredictable and does not depend on their hierarchy.<br>
 Only SkinnedMeshRenderer knows it &nbsp;&nbsp; ¯\\\_(ツ)\_/¯
 
 After extracting the bone array in `Start()` my script disables `SkinnedMeshRenderer` component as it is no longer needed. All the animations are performed by the script. You can verify it in the editor after hitting play button.
