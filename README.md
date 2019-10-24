@@ -36,7 +36,9 @@ If anyone knows how to optimize extracting `localToWorldMatrix` of the bones ple
 * Create a skinned character with `SkinnedMeshRenderer` component
 * Add `DualQuaternionSkinner.cs` component (it will require a `MeshFilter` component)
 * Enable mesh Read/Write in import settings<br>
+
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Mesh import settings.png" width="463">
+
 * All materials of the mesh should use a special shader to apply vertex positions. The shader is `MadCake/Material/Standard hacked for DQ skinning`
 * In order for bulging compensation to work properly, all the character's bones must have one local axis (consistent for all bones) aligned with the limb controlled by the corresponding bone.
 
