@@ -12,13 +12,13 @@
 public class DualQuaternionSkinner : MonoBehaviour
 {
 	/// <summary>
-	/// Bone orientation is required for bulge-compensation
-	/// Do not set directly, use custom editor instead
+	/// Bone orientation is required for bulge-compensation.<br>
+	/// Do not set directly, use custom editor instead.
 	/// </summary>
 	public Vector3 boneOrientationVector = Vector3.up;
 
 	/// <summary>
-	/// Only affects Play mode.
+	/// Only affects Play mode.<br>
 	/// In Edit mode, SkinnedMeshRenderer is responsible for the culling.
 	/// </summary>
 	public bool ViewFrustrumCulling = true;
@@ -65,7 +65,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 	const int textureWidth = 1024;  // no need to adjust compute shaders
 
 	/// <summary>
-	/// Adjusts the amount of bulge-compensation
+	/// Adjusts the amount of bulge-compensation.
 	/// </summary>
 	[Range(0,1)]
 	public float bulgeCompensation  = 0;
@@ -75,7 +75,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 	public ComputeShader shaderApplyMorph;
 
 	/// <summary>
-	/// Indicates whether DualQuaternionSkinner is currently active
+	/// Indicates whether DualQuaternionSkinner is currently active.
 	/// </summary>
 	public bool started { get; private set; } = false;
 
@@ -169,10 +169,11 @@ public class DualQuaternionSkinner : MonoBehaviour
 	int kernelHandleApplyMorph;
 
 	/// <summary>
-	/// Returns an array of currently applied blend shape weights.
-	/// Default range is 0-100. It is possible to apply negative weights or exceeding 100.
+	/// Returns an array of currently applied blend shape weights.<br>
+	/// Default range is 0-100.<br>
+	/// It is possible to apply negative weights or exceeding 100.
 	/// </summary>
-	/// <returns>Array of currently applied blend shape weights.</returns>
+	/// <returns>Array of currently applied blend shape weights</returns>
 	public float[] GetBlendShapeWeights()
 	{
 		float[] weights = new float[this.morphWeights.Length];
@@ -185,8 +186,9 @@ public class DualQuaternionSkinner : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Applies blend shape weights from the given array.
-	/// Default range is 0-100. It is possible to apply negative weights or exceeding 100.
+	/// Applies blend shape weights from the given array.<br>
+	/// Default range is 0-100.<br>
+	/// It is possible to apply negative weights or exceeding 100.
 	/// </summary>
 	/// <param name="weights">An array of weights to be applied</param>
 	public void SetBlendShapeWeights(float[] weights)
@@ -209,8 +211,9 @@ public class DualQuaternionSkinner : MonoBehaviour
     }
 
 	/// <summary>
-	/// Set weight for the blend shape with given index.
-	/// Default range is 0-100. It is possible to apply negative weights or exceeding 100.
+	/// Set weight for the blend shape with given index.<br>
+	/// Default range is 0-100.<br>
+	/// It is possible to apply negative weights or exceeding 100.
 	/// </summary>
 	/// <param name="index">Index of the blend shape</param>
 	/// <param name="weight">Weight to be applied</param>
@@ -233,11 +236,12 @@ public class DualQuaternionSkinner : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Returns currently applied weight for the blend shape with given index.
-	/// Default range is 0-100. It is possible to apply negative weights or exceeding 100.
+	/// Returns currently applied weight for the blend shape with given index.<br>
+	/// Default range is 0-100.<br>
+	/// It is possible to apply negative weights or exceeding 100.
 	/// </summary>
 	/// <param name="index">Index of the blend shape</param>
-	/// <returns>Currently applied weight.</returns>
+	/// <returns>Currently applied weight</returns>
 	public float GetBlendShapeWeight(int index)
 	{
 		if (this.started == false)
@@ -622,4 +626,3 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.mr.SetPropertyBlock(this.materialPropertyBlock);
 	}
 }
-

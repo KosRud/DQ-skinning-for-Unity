@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// Sorts bone indexes in imported meshes
-/// SkinnedMeshRenderer requires bone indexes to be sorted based on hierarchy
+/// Sorts bone indexes in imported meshes.<br>
+/// SkinnedMeshRenderer requires bone indexes to be sorted based on hierarchy.
 /// </summary>
 public class AssetPostProcessorReorderBones : AssetPostprocessor
 {
