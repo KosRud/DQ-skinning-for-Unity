@@ -8,7 +8,7 @@
 * zero GC allocations per frame
 * original bulging compensation method
 
-### Comparison:
+### Comparison to default linear skinning:
 
 |Gif|Difference|
 |----|----|
