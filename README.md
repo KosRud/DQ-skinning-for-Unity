@@ -84,6 +84,7 @@ I would also like to hear about your projects that use my script and your experi
 
 * Test/fix/improve/optimize bulging compensation
 * Implement toggle for bulging compensation
+* Implement simple runtime switching between **DualQuaternionSkinned** and built-in [SkinnedMeshRenderer](https://docs.unity3d.com/Manual/class-SkinnedMeshRenderer.html)
 * It might make sense to group the data from all instances of the script into one batch and run the compute shaders only once per frame regardless of how many animated characters you have
 
 ## Discussion
