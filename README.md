@@ -91,7 +91,7 @@ I would also like to hear about your projects that use my script and your experi
 
 # Known bugs
 
-* Heavy twisting causes the mesh to twitch. Currently investigating...
+* Heavy twisting with bulging compensation enabled causes the mesh to twitch. Currently investigating...
 
 ## Discussion
 
