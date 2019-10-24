@@ -6,7 +6,7 @@
 * works with any platform that supports compute shaders
 * preserves volume with deformation (look comparison)
 * zero GC allocations per frame
-* original bulging compensation method (alpha-testing, not ready for real-world applications yet)
+* original bulging compensation method
 
 ### Comparison:
 
@@ -69,7 +69,8 @@ I would also like to hear about your projects that use my script and your experi
 
 ## Future plans
 
-* Test/fix/improve bulging compensation
+* Test/fix/improve/optimize bulging compensation
+* Implement toggle for bulging compensation
 * It might make sense to group the data from all instances of the script into one batch and run the compute shaders only once per frame regardless of how many animated characters you have
 
 ## Discussion
