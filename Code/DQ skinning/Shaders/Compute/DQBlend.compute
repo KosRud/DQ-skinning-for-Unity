@@ -74,29 +74,30 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 
 	float4 rq = QuaternionMultiply(dq0.rotation_quaternion, QuaternionInvert(dq1.rotation_quaternion));
 
-	float3 axis = normalize(rq.xyz);
+	// branching is removed by the compiler optimization
+	if((bone_weights[1] != 0.0 && length(rq.xyz) > 0.001))
+	{
+		float3 axis = normalize(rq.xyz);
 
-	float4 boneDir0 = bone_directions.Load(bone_indexes[0]);
-	float4 boneDir1 = bone_directions.Load(bone_indexes[1]);
+		float4 boneDir0 = bone_directions.Load(bone_indexes[0]);
+		float4 boneDir1 = bone_directions.Load(bone_indexes[1]);
 
-	float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);
-	bisector = bone_indexes[0] > bone_indexes[1] ? bisector : -bisector;
-	float3 offset = bisector - axis * dot(bisector, axis);
+		float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);
+		bisector = bone_indexes[0] > bone_indexes[1] ? bisector : -bisector;
+		float3 offset = bisector - axis * dot(bisector, axis);
 
-	float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
+		float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
 
-	float x = bone_weights[1] / (bone_weights[0] + bone_weights[1]);
-	float compensation = 2.2*x-8.1*x*x+7.4*x*x*x;
+		float x = bone_weights[1] / (bone_weights[0] + bone_weights[1]);
+		float compensation = 2.2*x-8.1*x*x+7.4*x*x*x;
 
+		compensation *= vertinfo.compensation_coef;
+		compensation *= compensation_coef;
+		compensation *= angleCoef;
+		compensation *= 1.0 - bone_weights[2] / bone_weights[1];
 
-	compensation *= vertinfo.compensation_coef;
-	compensation *= compensation_coef;
-	compensation *= angleCoef;
-	compensation *= 1.0 - bone_weights[2] / bone_weights[1];
-
-	vertinfo.position.xyz = (bone_weights[1] != 0.0 && length(rq.xyz) > 0.001) ? 
-		vertinfo.position.xyz + offset * compensation :
-		vertinfo.position.xyz;
+		vertinfo.position.xyz += offset * compensation;
+	}
 
 	return vertinfo;
 }
