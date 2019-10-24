@@ -38,12 +38,23 @@ If anyone knows how to optimize extracting `localToWorldMatrix` of the bones ple
 * Enable mesh Read/Write in import settings<br>
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Mesh import settings.png" width="463">
 * All materials of the mesh should use a special shader to apply vertex positions. The shader is `MadCake/Material/Standard hacked for DQ skinning`
+* In order for bulging compensation to work properly, all the character's bones must have one local axis (consistent for all bones) aligned with the limb controlled by the corresponding bone.
+
+|Bones properly aligned|Bones not aligned|
+|----|----|
+|<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/bones aligned.png" width="400">|<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/bones not aligned.png" width="400">|
+
+* Whichever local axis of the bones was aligned with the limbs must be selected in the script gui:
+
+<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Orientation axis.png" width="363">
+
+If bulging is increased instead of decreased, select same axis with different direction (**X**&nbsp;=>&nbsp;**Negative&nbsp;X**)
 
 ## Common problems
 
 The script is programmed to automatically detect common setup problems. Check out the editor:
 
-<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Problems.png" width="413">
+<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Problems.png" width="363">
 
 ## Why do i need SkinnedMeshRenderer?
 
