@@ -89,6 +89,10 @@ I would also like to hear about your projects that use my script and your experi
 * Implement simple runtime switching between **DualQuaternionSkinned** and built-in [SkinnedMeshRenderer](https://docs.unity3d.com/Manual/class-SkinnedMeshRenderer.html)
 * It might make sense to group the data from all instances of the script into one batch and run the compute shaders only once per frame regardless of how many animated characters you have
 
+# Known bugs
+
+* Heavy twisting causes the mesh to twitch. Currently investigating...
+
 ## Discussion
 
 If you have any questions, ideas, bug reports, or just want to discuss the script, you can contact me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/)
