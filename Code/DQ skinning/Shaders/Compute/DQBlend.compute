@@ -81,31 +81,24 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 		float4 boneDir0 = bone_directions.Load(bone_indexes[0]);
 		float4 boneDir1 = bone_directions.Load(bone_indexes[1]);
 
-		if (bone_indexes[0] > bone_indexes[1])
+		if (bone_indexes[0] < bone_indexes[1])
 		{
 			boneDir0 *= -1;
-		}
-		else
-		{
 			boneDir1 *= -1;
 		}
 
-		//float angleCoef = saturate(2.0*sqrt(1.0 - rq.w));				// twisting should not increase coef, only bending
-		//float angleCoef = saturate(length(boneDir0 + boneDir1)) * 0.71;	// what if bones started at an angle?
+		/*
+			not used currently, but might:
+				* https://stackoverflow.com/questions/3684269/component-of-a-quaternion-rotation-around-an-axis
+				* http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition/
+				* http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition/forum.htm
+				* "Fiber Bundle Twist Reduction" Ken Shoemake in "Graphics Gems IV".
+		*/
 
-		rq.xyz *= dot(rq.xyz, axis);
-		rq = normalize(rq);
-		float angleCoef = saturate(2.0*sqrt(1.0 - rq.w));
-		// we don't need actual projected rotation, just the angle
-		// https://stackoverflow.com/questions/3684269/component-of-a-quaternion-rotation-around-an-axis
-		// http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition/
-		// http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition/forum.htm
-		// "Fiber Bundle Twist Reduction" Ken Shoemake in "Graphics Gems IV".
+		float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);	// =0 if bones were aligned
+		float3 offset = bisector - axis * dot(bisector, axis);
 
-		float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);	// =0 if bones were aligned (twist only)
-		float3 offset = any(bisector) ? cross(axis, bisector) : 0;
-
-		//float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
+		float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
 
 		float x = bone_weights[1] / (bone_weights[0] + bone_weights[1]);
 		//float compensation = 2.29*x-9.1*x*x+9.04*x*x*x;	// better outter shape
