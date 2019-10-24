@@ -3,7 +3,10 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 
-//sorts transform bone indexes in skinned mesh renderers so that we can swap skinned meshes at runtime
+/// <summary>
+/// Sorts bone indexes in imported meshes
+/// SkinnedMeshRenderer requires bone indexes to be sorted based on hierarchy
+/// </summary>
 public class AssetPostProcessorReorderBones : AssetPostprocessor
 {
 	void OnPostprocessModel(GameObject g)
@@ -23,7 +26,7 @@ public class AssetPostProcessorReorderBones : AssetPostprocessor
 		//list of bones
 		List<Transform> boneTransforms = smr.bones.ToList();
 
-		//sort alphabetically
+		//sort based on hierarchy
 		boneTransforms.Sort(CompareTransform);
 
 		//record bone index mappings (richardf advice)

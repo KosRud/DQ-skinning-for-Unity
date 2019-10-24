@@ -15,7 +15,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 	/// Bone orientation is required for bulge-compensation
 	/// Do not set directly, use custom editor instead
 	/// </summary>
-	public Vector3 boneOrientationVector;
+	public Vector3 boneOrientationVector = Vector3.up;
 
 	/// <summary>
 	/// Only affects Play mode.
