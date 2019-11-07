@@ -1,7 +1,7 @@
 # Dual quaternion skinning for Unity
 
 ### Features:
-* GPU skinning with compute shaders (only)
+* GPU skinning with compute shaders
 * blend shape support (calculations performed in compute shader)
 * works with any platform that supports compute shaders
 * preserves volume with deformation (look comparison)
