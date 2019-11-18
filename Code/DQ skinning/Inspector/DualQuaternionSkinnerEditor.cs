@@ -66,14 +66,8 @@ public class DualQuaternionSkinnerEditor : Editor
 		EditorGUILayout.EndHorizontal();
 
 		EditorGUILayout.Space();
-
-		bool culling = this.dqs.ViewFrustrumCulling;
-		this.dqs.ViewFrustrumCulling = EditorGUILayout.Toggle("View frustrum culling: ", this.dqs.ViewFrustrumCulling);
-		if (culling != this.dqs.ViewFrustrumCulling)
-		{
-			this.dqs.UpdateViewFrustrumCulling();
-		}
-
+		this.dqs.SetViewFrustrumCulling(EditorGUILayout.Toggle("View frustrum culling: ", this.dqs.viewFrustrumCulling));
+		this.dqs.SetTwistCompensation(EditorGUILayout.Toggle("Twist compensation (experimental): ", this.dqs.twistCompensation));
 		EditorGUILayout.Space();
 
 		BoneOrientation currentOrientation = BoneOrientation.X;
