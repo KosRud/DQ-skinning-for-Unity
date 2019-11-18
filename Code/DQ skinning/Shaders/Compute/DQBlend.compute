@@ -1,5 +1,6 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
+#pragma multi_compile_local __ TWIST_COMPENSATION_EXPERIMENTAL
 
 #include "DQ.cginc"
 
@@ -85,16 +86,22 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 		float AdotB = dot(bisector, axis);
 
 		bisector = bone_indexes[0] > bone_indexes[1] ? bisector : -bisector;
+
+#ifndef TWIST_COMPENSATION_EXPERIMENTAL
 		float3 offset = bisector - axis * AdotB;
-		//offset = normalize(offset);
+#else
+		float3 offset = normalize(bisector - axis * AdotB);
 
-		//AdotB = abs(AdotB);
+		AdotB = abs(AdotB);
 
-		//rq.xyz *= sqrt(1.0-AdotB*AdotB);
-		//rq.w /= length(rq);
+		rq.xyz *= sqrt(1.0-AdotB*AdotB);
+		rq.w /= length(rq);
 
-		//if (AdotB > 0.999)
-			//offset = 0.0;
+		if (AdotB > 0.999)
+			offset = 0.0;
+
+		// normalize() creates a bugged value if argument is zero-length vector
+#endif
 
 		float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
 

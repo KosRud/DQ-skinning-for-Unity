@@ -18,10 +18,15 @@ public class DualQuaternionSkinner : MonoBehaviour
 	public Vector3 boneOrientationVector = Vector3.up;
 
 	/// <summary>
-	/// Only affects Play mode.<br>
-	/// In Edit mode, SkinnedMeshRenderer is responsible for the culling.
+	/// Do not edit directly, use SetViewFrustrumCulling() instead.
 	/// </summary>
-	public bool ViewFrustrumCulling = true;
+	public bool viewFrustrumCulling = true;
+
+	/// <summary>
+	/// Toggle bulging compensation for twisting deformations (experimental).<br>
+	/// Do not edit directly, use SetTwistCompensation() instead.
+	/// </summary>
+	public bool twistCompensation = true;
 
 	struct VertexInfo
 	{
@@ -168,6 +173,48 @@ public class DualQuaternionSkinner : MonoBehaviour
 	int kernelHandleDQBlend;
 	int kernelHandleApplyMorph;
 
+	public void SetViewFrustrumCulling(bool viewFrustrumculling)
+	{
+		if (this.viewFrustrumCulling == viewFrustrumculling)
+			return;
+
+		this.viewFrustrumCulling = viewFrustrumculling;
+
+		if (this.started == true)
+			UpdateViewFrustrumCulling();
+	}
+
+	void UpdateViewFrustrumCulling()
+	{
+		if (this.viewFrustrumCulling)
+			this.mf.mesh.bounds = this.smr.localBounds;
+		else
+			this.mf.mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000000);
+	}
+
+	public void SetTwistCompensation(bool twistCompensation)
+	{
+		if (this.twistCompensation == twistCompensation)
+			return;
+
+		this.twistCompensation = twistCompensation;
+
+		if (this.started == true)
+		{
+			UpdateTwistCompensation();
+		}
+	}
+
+	void UpdateTwistCompensation()
+	{
+		if (this.twistCompensation)
+		{
+			this.shaderDQBlend.EnableKeyword("TWIST_COMPENSATION_EXPERIMENTAL");
+		} else {
+			this.shaderDQBlend.DisableKeyword("TWIST_COMPENSATION_EXPERIMENTAL");
+		}
+	}
+
 	/// <summary>
 	/// Returns an array of currently applied blend shape weights.<br>
 	/// Default range is 0-100.<br>
@@ -277,26 +324,6 @@ public class DualQuaternionSkinner : MonoBehaviour
     }
 
 	/// <summary>
-	/// If the value of ViewFrustrumCulling was changed while DualQuaternionSkinner is active (started == true), UpdateViewFrustrumCulling() must be called in order for the change to take effect.
-	/// </summary>
-	public void UpdateViewFrustrumCulling()
-	{
-		if (this.started == false)
-		{
-			return;
-		}
-
-		if (this.ViewFrustrumCulling)
-		{
-			this.mf.mesh.bounds = this.smr.localBounds;
-		}
-		else
-		{
-			this.mf.mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000000);
-		}
-	}
-
-	/// <summary>
 	/// If the value of boneOrientationVector was changed while DualQuaternionSkinner is active (started == true), UpdatePerVertexCompensationCoef() must be called in order for the change to take effect.
 	/// </summary>
 	public void UpdatePerVertexCompensationCoef()
@@ -379,7 +406,7 @@ public class DualQuaternionSkinner : MonoBehaviour
             enableRandomWrite = true
         };
         this.rtSkinnedData_1.Create();
-		this.shaderDQBlend.SetTexture(this.kernelHandleComputeBoneDQ, "skinned_data_1", this.rtSkinnedData_1);
+		this.shaderDQBlend.SetTexture(this.kernelHandleDQBlend, "skinned_data_1", this.rtSkinnedData_1);
 
         this.rtSkinnedData_2 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat)
         {
@@ -387,7 +414,7 @@ public class DualQuaternionSkinner : MonoBehaviour
             enableRandomWrite = true
         };
         this.rtSkinnedData_2.Create();
-		this.shaderDQBlend.SetTexture(this.kernelHandleComputeBoneDQ, "skinned_data_2", this.rtSkinnedData_2);
+		this.shaderDQBlend.SetTexture(this.kernelHandleDQBlend, "skinned_data_2", this.rtSkinnedData_2);
 
         this.rtSkinnedData_3 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.RGFloat)
         {
@@ -395,14 +422,14 @@ public class DualQuaternionSkinner : MonoBehaviour
             enableRandomWrite = true
         };
         this.rtSkinnedData_3.Create();
-		this.shaderDQBlend.SetTexture(this.kernelHandleComputeBoneDQ, "skinned_data_3", this.rtSkinnedData_3);
+		this.shaderDQBlend.SetTexture(this.kernelHandleDQBlend, "skinned_data_3", this.rtSkinnedData_3);
 
 		this.bufPoseMatrices = new ComputeBuffer(this.mf.mesh.bindposes.Length, sizeof(float) * 16);
 		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "pose_matrices", this.bufPoseMatrices);
 
 		this.bufSkinnedDq = new ComputeBuffer(this.mf.mesh.bindposes.Length, sizeof(float) * 8);
 		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "skinned_dual_quaternions", this.bufSkinnedDq);
-		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "skinned_dual_quaternions", this.bufSkinnedDq);
+		this.shaderDQBlend.SetBuffer(this.kernelHandleDQBlend, "skinned_dual_quaternions", this.bufSkinnedDq);
 
 		this.bufBoneDirections = new ComputeBuffer(this.mf.mesh.bindposes.Length, sizeof(float) * 4);
 		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "bone_directions", this.bufBoneDirections);
@@ -442,7 +469,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 		}
 
 		this.bufVertInfo.SetData(vertInfos);
-		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "vertex_infos", this.bufVertInfo);
+		this.shaderDQBlend.SetBuffer(this.kernelHandleDQBlend, "vertex_infos", this.bufVertInfo);
 		
 		this.bufMorphTemp_1 = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 16 + sizeof(int) * 4);
 		this.bufMorphTemp_2 = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 16 + sizeof(int) * 4);
@@ -461,6 +488,8 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.bufBindDq.SetData(bindDqs);
 		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "bind_dual_quaternions", this.bufBindDq);
 
+
+		this.UpdateTwistCompensation();
 		this.UpdateViewFrustrumCulling();
 		this.ApplyMorphs();
 	}
@@ -475,7 +504,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 			this.morphWeights
 		);
 
-		this.shaderDQBlend.SetBuffer(this.kernelHandleComputeBoneDQ, "vertex_infos", bufMorphedVertexInfos);
+		this.shaderDQBlend.SetBuffer(this.kernelHandleDQBlend, "vertex_infos", bufMorphedVertexInfos);
 	}
 
 	ComputeBuffer GetMorphedVertexInfos(ComputeBuffer bufOriginal, ref ComputeBuffer bufTemp_1, ref ComputeBuffer bufTemp_2, ComputeBuffer[] arrBufDelta, float[] weights)
@@ -609,7 +638,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 			"self_matrix",
 			this.transform.worldToLocalMatrix
 		);
-		this.shaderComputeBoneDQ.Dispatch(this.kernelHandleDQBlend, numThreadGroups, 1, 1);
+		this.shaderComputeBoneDQ.Dispatch(this.kernelHandleComputeBoneDQ, numThreadGroups, 1, 1);
 
 		numThreadGroups = this.mf.mesh.vertexCount / numthreads;
 		numThreadGroups += this.mf.mesh.vertexCount % numthreads == 0 ? 0 : 1;
