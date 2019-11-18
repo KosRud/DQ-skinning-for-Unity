@@ -14,6 +14,11 @@
 |----|----|
 |<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/before-after.gif" width="400">|<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/diff.png" width="400">|
 
+
+### Bulging compensation demo:
+
+<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Leg.gif" width="400">
+
 # Warning:
 You will not see any effect in edit mode.<br>
 The scipt only works in play mode.<br>
