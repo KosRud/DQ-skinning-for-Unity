@@ -17,7 +17,7 @@
 
 ### Bulging compensation demo:
 
-<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Leg.gif" width="400">
+<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Leg.gif" width="600">
 
 # Warning:
 You will not see any effect in edit mode.<br>
