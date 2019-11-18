@@ -8,7 +8,7 @@
 * zero GC allocations per frame
 * original bulging compensation method
 
-### Comparison to default linear skinning:
+### Comparison DQ vs built-in linear:
 
 |Gif|Difference|
 |----|----|
@@ -26,7 +26,7 @@ If you see no effect in play mode verify that you are using the right shader.
 
 ## Unity version
 The script was tested with following Unity versions:
-* **2019.2.9f1**
+* **2020.1.0a13.1443**
 
 ## Performance:
 
