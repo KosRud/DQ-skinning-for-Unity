@@ -77,14 +77,24 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 	// branching is removed by the compiler optimization
 	if((bone_weights[1] != 0.0 && length(rq.xyz) > 0.001))
 	{
-		float3 axis = normalize(rq.xyz);
-
 		float4 boneDir0 = bone_directions.Load(bone_indexes[0]);
 		float4 boneDir1 = bone_directions.Load(bone_indexes[1]);
 
+		float3 axis = normalize(rq.xyz);
 		float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);
+		float AdotB = dot(bisector, axis);
+
 		bisector = bone_indexes[0] > bone_indexes[1] ? bisector : -bisector;
-		float3 offset = bisector - axis * dot(bisector, axis);
+		float3 offset = bisector - axis * AdotB;
+		//offset = normalize(offset);
+
+		//AdotB = abs(AdotB);
+
+		//rq.xyz *= sqrt(1.0-AdotB*AdotB);
+		//rq.w /= length(rq);
+
+		//if (AdotB > 0.999)
+			//offset = 0.0;
 
 		float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
 
