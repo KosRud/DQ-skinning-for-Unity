@@ -141,7 +141,7 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 			bool _DoSkinning;
 
 			// the actual skinning function
-			// don't change the code but change the argument type to the name if vertex input structure used in current pass
+			// don't change the code but change the argument type to the name of vertex input structure used in current pass
 			// for this pass it is VertexInputSkinningForward
 			void vert(inout VertexInputSkinningForward v) {
 				if (_DoSkinning) {
@@ -317,6 +317,8 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
 				return vertAdd(v);
 			}
+
+			// ----- DQ modification end -----
 
             ENDCG
         }
