@@ -26,7 +26,7 @@ If you see no effect in play mode verify that you are using the right shader.
 
 ## Unity version
 The script was tested with following Unity versions:
-* **2020.1.0a13.1443**
+* **2020.1.0a13.1443** (earlier versions do not support `#pragma multi_compile` in compute shaders)
 
 ## Performance:
 
@@ -65,6 +65,12 @@ The script is programmed to automatically detect common setup problems. Check ou
 
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Problems.png" width="363">
 
+## Known bugs
+
+Must use [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) = [AlwaysAnimate](https://docs.unity3d.com/ScriptReference/AnimatorCullingMode.AlwaysAnimate.html) in [Animator](https://docs.unity3d.com/ScriptReference/Animator.html). Otherwise, the mesh is treated as permanently invisible.
+
+You can write a short script that will toggle [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) based on [visibility](https://docs.unity3d.com/ScriptReference/Renderer-isVisible.html) to get proper culling.
+
 ## Why do i need SkinnedMeshRenderer?
 
 My scripts uses `SkinnedMeshRenderer` to extract an array of bones from it. Yep, that's it.<br>
@@ -92,6 +98,7 @@ I would also like to hear about your projects that use my script and your experi
 * Test/improve/optimize bulging compensation
 * Implement toggle for bulging compensation
 * Implement simple runtime switching between **DualQuaternionSkinned** and built-in [SkinnedMeshRenderer](https://docs.unity3d.com/Manual/class-SkinnedMeshRenderer.html)
+* Implement proper animation culling (see **known bugs**)
 * It might make sense to group the data from all instances of the script into one batch and run the compute shaders only once per frame regardless of how many animated characters you have
 
 ## Discussion
