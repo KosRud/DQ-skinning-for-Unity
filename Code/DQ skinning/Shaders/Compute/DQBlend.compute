@@ -84,7 +84,7 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 		float3 axis = normalize(rq.xyz);
 		float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);
 		bisector = bone_indexes[0] > bone_indexes[1] ? bisector : -bisector;
-		float AdotB = abs(dot(axis, bisector));
+		float AdotB = dot(axis, bisector);
 
 #ifndef TWIST_COMPENSATION_EXPERIMENTAL
 		float3 offset = bisector - axis * AdotB;
@@ -98,6 +98,8 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 			offset = 0.0;
 
 		// normalize() creates a bugged value if argument is zero-length vector
+
+		// ToDo: test old cross variant, (170; -45; 0) still gives s-shaped contortion
 #endif
 
 		float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
