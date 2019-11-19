@@ -83,19 +83,16 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 
 		float3 axis = normalize(rq.xyz);
 		float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);
-		float AdotB = dot(bisector, axis);
-
 		bisector = bone_indexes[0] > bone_indexes[1] ? bisector : -bisector;
+		float AdotB = abs(dot(axis, bisector));
 
 #ifndef TWIST_COMPENSATION_EXPERIMENTAL
 		float3 offset = bisector - axis * AdotB;
 #else
 		float3 offset = normalize(bisector - axis * AdotB);
-
-		AdotB = abs(AdotB);
-
-		rq.xyz *= sqrt(1.0-AdotB*AdotB);
-		rq.w /= length(rq);
+		
+		float rqW2 = rq.w * rq.w;
+		rq.w /= sqrt(rqW2 + (1.0 - rqW2) * (1.0-AdotB*AdotB)); // angle of projected rotation
 
 		if (AdotB > 0.999)
 			offset = 0.0;
