@@ -85,9 +85,7 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 		float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);
 		bisector = bone_indexes[0] > bone_indexes[1] ? bisector : -bisector;
 
-		float3 offset = bisector - axis * dot(axis, bisector) * 0.5;
-		// "- axis * dot(axis, bisector)" squashes along perpendicular axis
-		// 0.5 coef splits the squashing equally along two axes
+		float3 offset = bisector - axis * dot(axis, bisector);
 
 		float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
 
