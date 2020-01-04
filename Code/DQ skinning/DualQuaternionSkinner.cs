@@ -22,12 +22,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 	/// </summary>
 	public bool viewFrustrumCulling = true;
 
-	/// <summary>
-	/// Toggle bulging compensation for twisting deformations (experimental).<br>
-	/// Do not edit directly, use SetTwistCompensation() instead.
-	/// </summary>
-	public bool twistCompensation = true;
-
 	struct VertexInfo
 	{
 		// could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
@@ -190,29 +184,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 			this.mf.mesh.bounds = this.smr.localBounds;
 		else
 			this.mf.mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000000);
-	}
-
-	public void SetTwistCompensation(bool twistCompensation)
-	{
-		if (this.twistCompensation == twistCompensation)
-			return;
-
-		this.twistCompensation = twistCompensation;
-
-		if (this.started == true)
-		{
-			UpdateTwistCompensation();
-		}
-	}
-
-	void UpdateTwistCompensation()
-	{
-		if (this.twistCompensation)
-		{
-			this.shaderDQBlend.EnableKeyword("TWIST_COMPENSATION_EXPERIMENTAL");
-		} else {
-			this.shaderDQBlend.DisableKeyword("TWIST_COMPENSATION_EXPERIMENTAL");
-		}
 	}
 
 	/// <summary>
@@ -488,8 +459,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.bufBindDq.SetData(bindDqs);
 		this.shaderComputeBoneDQ.SetBuffer(this.kernelHandleComputeBoneDQ, "bind_dual_quaternions", this.bufBindDq);
 
-
-		this.UpdateTwistCompensation();
 		this.UpdateViewFrustrumCulling();
 		this.ApplyMorphs();
 	}
