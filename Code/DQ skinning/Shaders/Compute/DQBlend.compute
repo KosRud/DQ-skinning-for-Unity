@@ -96,6 +96,7 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 		compensation *= compensation_coef;
 		compensation *= angleCoef;
 		compensation *= 1.0 - bone_weights[2] / bone_weights[1];
+		compensation *= bone_weights[0] + bone_weights[1];
 
 		vertinfo.position.xyz += offset * compensation;
 	}
