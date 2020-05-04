@@ -347,15 +347,13 @@ public class DualQuaternionSkinner : MonoBehaviour
 			this.arrBufMorphDeltas[i].SetData(deltaVertInfos);
 		}
 
-        this.mr.materials = new Material[this.smr.materials.Length];
-		for (int i = 0; i < this.mr.materials.Length; i++)
+        Material[] materials = new Material[this.smr.materials.Length];
+		for (int i = 0; i < this.smr.materials.Length; i++)
 		{
-			this.mr.materials[i] = this.smr.materials[i];
+			materials[i] = new Material(this.smr.materials[i]);
+			materials[i].SetInt("_DoSkinning", 1);
 		}
-		foreach (Material m in this.mr.materials)
-		{
-			m.SetInt("_DoSkinning", 1);
-		}
+		this.mr.materials = materials;
 
 		this.shaderDQBlend.SetInt("textureWidth", textureWidth);
 
