@@ -3,6 +3,8 @@ using UnityEditor;
 
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
+
 /// <summary>
 /// Provides custom inspector for {@link DualQuaternionSkinner}
 /// </summary>
@@ -178,3 +180,5 @@ public class DualQuaternionSkinnerEditor : Editor
 		return false;
 	}
 }
+
+#endif

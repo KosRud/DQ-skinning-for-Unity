@@ -3,6 +3,8 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 
+#if UNITY_EDITOR
+
 /// <summary>
 /// Sorts bone indexes in imported meshes.<br>
 /// SkinnedMeshRenderer requires bone indexes to be sorted based on hierarchy.
@@ -76,3 +78,5 @@ public class AssetPostProcessorReorderBones : AssetPostprocessor
         return 0;
 	}
 }
+
+#endif
