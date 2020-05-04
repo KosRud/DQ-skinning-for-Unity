@@ -8,7 +8,6 @@
 /// Make sure that all materials of the animated object are using shader \"<b>MadCake/Material/Standard hacked for DQ skinning</b>\"
 /// </summary>
 [RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(SkinnedMeshRenderer))]
 public class DualQuaternionSkinner : MonoBehaviour
 {
 	/// <summary>
@@ -347,10 +346,9 @@ public class DualQuaternionSkinner : MonoBehaviour
 			this.arrBufMorphDeltas[i].SetData(deltaVertInfos);
 		}
 
-        Material[] materials = new Material[this.smr.materials.Length];
-		for (int i = 0; i < this.smr.materials.Length; i++)
+		Material[] materials = this.smr.sharedMaterials;
+		for (int i = 0; i < materials.Length; i++)
 		{
-			materials[i] = new Material(this.smr.materials[i]);
 			materials[i].SetInt("_DoSkinning", 1);
 		}
 		this.mr.materials = materials;
