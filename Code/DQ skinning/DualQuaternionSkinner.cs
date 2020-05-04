@@ -160,8 +160,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 	RenderTexture rtSkinnedData_2;
 	RenderTexture rtSkinnedData_3;
 
-	Material[] materials;
-
 	int kernelHandleComputeBoneDQ;
 	int kernelHandleDQBlend;
 	int kernelHandleApplyMorph;
@@ -349,9 +347,11 @@ public class DualQuaternionSkinner : MonoBehaviour
 			this.arrBufMorphDeltas[i].SetData(deltaVertInfos);
 		}
 
-        this.mr.materials = this.materials;  // bug workaround
-		this.materials = this.mr.materials;  // bug workaround
-
+        this.mr.materials = new Material[this.smr.materials.Length];
+		for (int i = 0; i < this.mr.materials.Length; i++)
+		{
+			this.mr.materials[i] = this.smr.materials[i];
+		}
 		foreach (Material m in this.mr.materials)
 		{
 			m.SetInt("_DoSkinning", 1);
@@ -545,7 +545,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 			}
 		}
 	}
-
 	void OnDestroy()
 	{
 		this.ReleaseBuffers();
@@ -564,7 +563,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.kernelHandleDQBlend = this.shaderDQBlend.FindKernel("CSMain");
 		this.kernelHandleApplyMorph = this.shaderApplyMorph.FindKernel("CSMain");
 
-		this.materials = this.smr.materials;
 		this.bones = this.smr.bones;
 
 		this.started = true;
