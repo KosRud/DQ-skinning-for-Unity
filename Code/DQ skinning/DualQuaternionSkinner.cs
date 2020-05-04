@@ -78,7 +78,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 	/// </summary>
 	public bool started { get; private set; } = false;
 
-	DualQuaternion[] poseDualQuaternions;
 	Matrix4x4[] poseMatrices;
 
 	ComputeBuffer bufPoseMatrices;
@@ -360,7 +359,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 
 		this.shaderDQBlend.SetInt("textureWidth", textureWidth);
 
-		this.poseDualQuaternions = new DualQuaternion[this.mf.mesh.bindposes.Length];
 		this.poseMatrices = new Matrix4x4[this.mf.mesh.bindposes.Length];
 
 		// initiate textures and buffers
@@ -415,8 +413,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 		for (int i = 0; i < vertInfos.Length; i++)
 		{
 			vertInfos[i].position = vertices[i];
-			vertInfos[i].normal = normals[i];
-			vertInfos[i].tangent = tangents[i];
 
 			vertInfos[i].boneIndex0 = boneWeights[i].boneIndex0;
 			vertInfos[i].boneIndex1 = boneWeights[i].boneIndex1;
@@ -437,6 +433,22 @@ public class DualQuaternionSkinner : MonoBehaviour
 			Vector3 toBone = bonePosition - (Vector3)vertInfos[i].position;
 
 			vertInfos[i].compensation_coef = Vector3.Cross(toBone, boneDirection).magnitude;
+		}
+
+		if (normals.Length > 0)
+		{
+			for (int i = 0; i < vertInfos.Length; i++)
+			{
+				vertInfos[i].normal = normals[i];
+			}
+		}
+
+		if (tangents.Length > 0)
+		{
+			for (int i = 0; i < vertInfos.Length; i++)
+			{
+				vertInfos[i].tangent = tangents[i];
+			}
 		}
 
 		this.bufVertInfo.SetData(vertInfos);
@@ -579,19 +591,6 @@ public class DualQuaternionSkinner : MonoBehaviour
 
 		for (int i = 0; i < this.bones.Length; i++)
 		{
-			this.poseDualQuaternions[i].rotationQuaternion = this.bones[i].rotation;
-
-			Vector3 pos = this.bones[i].position;
-
-			// could use float3 instead of float4 for position but NVidia says structures not aligned to 128 bits are slow
-			// https://developer.nvidia.com/content/understanding-structured-buffer-performance
-			this.poseDualQuaternions[i].position = new Vector4(
-				pos.x,
-				pos.y,
-				pos.z,
-				0
-			);	// not a proper quaternion, just a position. shader handles the rest
-
 			this.poseMatrices[i] = this.bones[i].localToWorldMatrix;
 		}
 		
