@@ -38,8 +38,6 @@ If anyone knows how to optimize extracting `localToWorldMatrix` of the bones ple
 
 Works **A LOT** faster with IL2CPP, about 30% slower than built-in skinning in worst-case scenario according to my testing.
 
-**did not benchmark bulging compensation yet**
-
 ## How to set up:
 
 * Create a skinned character with `SkinnedMeshRenderer` component
