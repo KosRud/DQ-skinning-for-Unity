@@ -36,6 +36,8 @@ As long as you are not creating hundreds of characters with complex rigs (no mat
 
 If anyone knows how to optimize extracting `localToWorldMatrix` of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
 
+Works **A LOT** faster with IL2CPP, about 30% slower than built-in skinning in worst-case scenario according to my testing.
+
 **did not benchmark bulging compensation yet**
 
 ## How to set up:
