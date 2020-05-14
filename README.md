@@ -6,7 +6,7 @@
 * works with any platform that supports compute shaders
 * preserves volume with deformation (look comparison)
 * zero GC allocations per frame
-* original bulging compensation method
+* original bulging compensation [method](#bulging-compensation-method)
 
 ### Comparison DQ vs built-in linear:
 
@@ -27,16 +27,6 @@ If you see no effect in play mode verify that you are using the right shader.
 ## Unity version
 The script was tested with following Unity versions:
 * **2020.1.0a13.1443** (earlier versions do not support `#pragma multi_compile` in compute shaders)
-
-## Performance:
-
-During my testing the amount of time spent on actual skinning was negligible compared to the amount of time extracting `localToWorldMatrix` from every bone in the hierarchy.
-
-As long as you are not creating hundreds of characters with complex rigs (no matter the polycount) there should be no significant performance hit.
-
-If anyone knows how to optimize extracting `localToWorldMatrix` of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
-
-Works **A LOT** faster with IL2CPP, about 30% slower than built-in skinning in worst-case scenario according to my testing.
 
 ## How to set up:
 
@@ -79,6 +69,16 @@ Only SkinnedMeshRenderer knows it &nbsp;&nbsp; ¯\\\_(ツ)\_/¯
 
 After extracting the bone array in `Start()` my script disables `SkinnedMeshRenderer` component as it is no longer needed. All the animations are performed by the script. You can verify it in the editor after hitting play button.
 
+## Performance:
+
+During my testing the amount of time spent on actual skinning was negligible compared to the amount of time extracting `localToWorldMatrix` from every bone in the hierarchy.
+
+As long as you are not creating hundreds of characters with complex rigs (no matter the polycount) there should be no significant performance hit.
+
+If anyone knows how to optimize extracting `localToWorldMatrix` of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
+
+Works **A LOT** faster with IL2CPP, about 30% slower than built-in skinning in worst-case scenario according to my testing.
+
 ## How do I use custom shaders?
 
 Alas it's complicated.<br>
@@ -104,3 +104,13 @@ I would also like to hear about your projects that use my script and your experi
 ## Discussion
 
 If you have any questions, ideas, bug reports, or just want to discuss the script, you can contact me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/)
+
+## Bulging compensation method
+
+The bulging compensation method used is described in the [article](https://journals.khnu.km.ua/vestnik/pdf/tech/pdfbase/2020/2020_1/1-2020_(281).pdf#page=12).
+
+**Notes:**
+* In formula (6) there is a mistake, **x** should be replaced by **w_2** (there is no variable named x)
+* Since publishing the article I found a better polynomial instead of (9), the coefficients are as follows: 2.2; -10; 11.2. The relevant commit: [link](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/commit/89c58b61bd928cb877130d9cba93ada52972ca3b)
+* In formula (12) there are weird brackets around V_bisector. This is a software bug, they should be ignored. This happens multiple times later in the article.
+* The stretched region of the model in Fig (7), that looks weird even after applying the fix (though is no longer jagged), is actually caused by using improperly prepared armature. The spine and the shoulder have different local axes aligned along the joint. This contradicts one of the requirements listed at the top of page 17.
