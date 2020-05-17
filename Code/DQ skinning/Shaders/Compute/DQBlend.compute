@@ -90,7 +90,7 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 		float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
 
 		float x = bone_weights[1] / (bone_weights[0] + bone_weights[1]);
-		float compensation = 2.2*x-8.8*x*x+8.8*x*x*x;
+		float compensation = 2.2*x-9.6*x*x+10.4*x*x*x;
 
 		compensation *= vertinfo.compensation_coef;
 		compensation *= compensation_coef;
