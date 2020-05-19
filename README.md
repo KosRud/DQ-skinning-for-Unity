@@ -111,6 +111,6 @@ The bulging compensation method used is described in the [article](https://journ
 
 **Notes:**
 * In formula (6) there is a mistake, **x** should be replaced by **w_2** (there is no variable named x)
-* Since publishing the article I found a better polynomial instead of (9), the coefficients are as follows: 2.2; -10; 11.2. The relevant commit: [link](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/commit/89c58b61bd928cb877130d9cba93ada52972ca3b)
+* Since publishing the article I found a better polynomial instead of (9), the coefficients are as follows: 2.2; -9.6; 10.4
 * In formula (12) there are weird brackets around V_bisector. This is a software bug, they should be ignored. This happens multiple times later in the article.
 * The stretched region of the model in Fig (7), that looks weird even after applying the fix (though is no longer jagged), is actually caused by using improperly prepared armature. The spine and the shoulder have different local axes aligned along the joint. This contradicts one of the requirements listed at the top of page 17.
