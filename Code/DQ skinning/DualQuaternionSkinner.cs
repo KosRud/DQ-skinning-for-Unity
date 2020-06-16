@@ -450,8 +450,8 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.bufVertInfo.SetData(vertInfos);
 		this.shaderDQBlend.SetBuffer(this.kernelHandleDQBlend, "vertex_infos", this.bufVertInfo);
 		
-		this.bufMorphTemp_1 = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 16 + sizeof(int) * 4);
-		this.bufMorphTemp_2 = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 16 + sizeof(int) * 4);
+		this.bufMorphTemp_1 = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 16 + sizeof(int) * 4 + sizeof(float));
+		this.bufMorphTemp_2 = new ComputeBuffer(this.mf.mesh.vertexCount, sizeof(float) * 16 + sizeof(int) * 4 + sizeof(float));
 
 		// bind DQ buffer
 
