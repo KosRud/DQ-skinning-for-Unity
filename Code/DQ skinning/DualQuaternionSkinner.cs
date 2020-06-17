@@ -318,6 +318,16 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.ApplyMorphs();
 	}
 
+	int GetVertexTextureHeight(int vertexCount, int textureWidth)
+	{
+		int textureHeight = this.mf.sharedMesh.vertexCount / textureWidth;
+		if (this.mf.sharedMesh.vertexCount % textureWidth != 0)
+		{
+			textureHeight++;
+		}
+		return textureHeight;
+	}
+
 	void GrabMeshFromSkinnedMeshRenderer()
 	{
 		this.ReleaseBuffers();
@@ -364,11 +374,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 
 		// initiate textures and buffers
 
-		int textureHeight = this.mf.sharedMesh.vertexCount / textureWidth;
-		if (this.mf.sharedMesh.vertexCount % textureWidth != 0)
-		{
-			textureHeight++;
-		}
+		int textureHeight = GetVertexTextureHeight(this.mf.sharedMesh.vertexCount, textureWidth);
 
         this.rtSkinnedData_1 = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat)
         {
@@ -616,7 +622,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 		this.materialPropertyBlock.SetTexture("skinned_data_1", this.rtSkinnedData_1);
 		this.materialPropertyBlock.SetTexture("skinned_data_2", this.rtSkinnedData_2);
 		this.materialPropertyBlock.SetTexture("skinned_data_3", this.rtSkinnedData_3);
-		this.materialPropertyBlock.SetInt("skinned_tex_height", this.mf.sharedMesh.vertexCount / textureWidth);
+		this.materialPropertyBlock.SetInt("skinned_tex_height", GetVertexTextureHeight(this.mf.sharedMesh.vertexCount, textureWidth));
 		this.materialPropertyBlock.SetInt("skinned_tex_width", textureWidth);
 
 		this.mr.SetPropertyBlock(this.materialPropertyBlock);
