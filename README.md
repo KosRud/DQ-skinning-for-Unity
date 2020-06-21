@@ -55,7 +55,6 @@ You will not see any effect in edit mode.<br>
 The scipt only works in play mode.<br>
 If you see no effect in play mode verify that you are using the right shader.
 
-
 ### Why do i need SkinnedMeshRenderer?
 
 My scripts uses `SkinnedMeshRenderer` to extract an array of bones from it. Yep, that's it.<br>
@@ -63,6 +62,16 @@ The order of bones is unpredictable and does not depend on their hierarchy.<br>
 Only SkinnedMeshRenderer knows it &nbsp;&nbsp; ¯\\\_(ツ)\_/¯
 
 After extracting the bone array in `Start()` my script disables `SkinnedMeshRenderer` component as it is no longer needed. All the animations are performed by the script. You can verify it in the editor after hitting play button.
+
+### How do I use custom shaders?
+
+Alas it's complicated.<br>
+I added comments to "Standard hacked for DQ skinning" marking the alterations i made to the Standard shader.<br>
+You can try to do the same with your own shader to make it work with the script.
+
+Feel free to contact me in [this thread](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/) at unity forum if you need help.
+
+I would also like to hear about your projects that use my script and your experience with it.
 
 ## Known bugs
 
@@ -79,16 +88,6 @@ As long as you are not creating hundreds of characters with complex rigs (no mat
 If anyone knows how to optimize extracting `localToWorldMatrix` of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
 
 Works **A LOT** faster with IL2CPP, about 30% slower than built-in skinning in worst-case scenario according to my testing.
-
-## How do I use custom shaders?
-
-Alas it's complicated.<br>
-I added comments to "Standard hacked for DQ skinning" marking the alterations i made to the Standard shader.<br>
-You can try to do the same with your own shader to make it work with the script.
-
-Feel free to contact me in [this thread](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/) at unity forum if you need help.
-
-I would also like to hear about your projects that use my script and your experience with it.
 
 ## API
 
