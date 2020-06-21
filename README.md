@@ -1,6 +1,6 @@
 # Dual quaternion skinning for Unity
 
-### Features:
+### Features
 * GPU skinning with compute shaders
 * blend shape support (calculations performed in compute shader)
 * works with any platform that supports compute shaders
@@ -8,14 +8,14 @@
 * zero GC allocations per frame
 * original bulging compensation [method](#bulging-compensation-method)
 
-### Comparison DQ vs built-in linear:
+### Comparison DQ vs built-in linear
 
 |Gif|Difference|
 |----|----|
 |<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/before-after.gif" width="400">|<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/diff.png" width="400">|
 
 
-### Bulging compensation demo:
+### Bulging compensation demo
 
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Leg.gif" width="600">
 
@@ -23,7 +23,7 @@
 The script was tested with following Unity versions:
 * **2020.1.0a13.1443** (earlier versions do not support `#pragma multi_compile` in compute shaders)
 
-## How to set up:
+## How to set up
 
 * Create a skinned character with `SkinnedMeshRenderer` component
 * Add `DualQuaternionSkinner.cs` component (it will require a `MeshFilter` component)
@@ -50,7 +50,7 @@ The script is programmed to automatically detect common setup problems. Check ou
 
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Problems.png" width="363">
 
-### Warning:
+### Warning
 You will not see any effect in edit mode.<br>
 The scipt only works in play mode.<br>
 If you see no effect in play mode verify that you are using the right shader.
@@ -69,7 +69,7 @@ Only SkinnedMeshRenderer knows it &nbsp;&nbsp; ¯\\\_(ツ)\_/¯
 
 After extracting the bone array in `Start()` my script disables `SkinnedMeshRenderer` component as it is no longer needed. All the animations are performed by the script. You can verify it in the editor after hitting play button.
 
-## Performance:
+## Performance
 
 During my testing the amount of time spent on actual skinning was negligible compared to the amount of time extracting `localToWorldMatrix` from every bone in the hierarchy.
 
