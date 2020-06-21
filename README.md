@@ -1,3 +1,4 @@
+\mainpage
 # Dual quaternion skinning for Unity
 
 ### Features

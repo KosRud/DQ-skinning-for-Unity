@@ -16,10 +16,7 @@ public class DualQuaternionSkinner : MonoBehaviour
 	/// </summary>
 	public Vector3 boneOrientationVector = Vector3.up;
 
-	/// <summary>
-	/// Do not edit directly, use SetViewFrustrumCulling() instead.
-	/// </summary>
-	public bool viewFrustrumCulling = true;
+	bool viewFrustrumCulling = true;
 
 	struct VertexInfo
 	{
@@ -163,6 +160,10 @@ public class DualQuaternionSkinner : MonoBehaviour
 	int kernelHandleDQBlend;
 	int kernelHandleApplyMorph;
 
+	/// <summary>
+	/// Enable or disable view frustrum culling.<br>
+	/// When moving the bones manually to test the script, bounding box does not update (it is pre-calculated based on available animations), which may lead to improper culling.
+	/// </summary>
 	public void SetViewFrustrumCulling(bool viewFrustrumculling)
 	{
 		if (this.viewFrustrumCulling == viewFrustrumculling)
@@ -172,6 +173,15 @@ public class DualQuaternionSkinner : MonoBehaviour
 
 		if (this.started == true)
 			UpdateViewFrustrumCulling();
+	}
+
+	/// <summary>
+	/// Returns current state of view frustrum culling.
+	/// </summary>
+	/// <returns>Current state of view frustrum culling (true = enabled, false = disabled)</returns>
+	public bool GetViewFrustrumCulling()
+	{
+		return this.viewFrustrumCulling;
 	}
 
 	void UpdateViewFrustrumCulling()
