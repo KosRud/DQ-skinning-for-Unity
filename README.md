@@ -1,6 +1,6 @@
 # Dual quaternion skinning for Unity
 
-### Features:
+### Features
 * GPU skinning with compute shaders
 * blend shape support (calculations performed in compute shader)
 * works with any platform that supports compute shaders
@@ -8,27 +8,22 @@
 * zero GC allocations per frame
 * original bulging compensation [method](#bulging-compensation-method)
 
-### Comparison DQ vs built-in linear:
+### Comparison DQ vs built-in linear
 
 |Gif|Difference|
 |----|----|
 |<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/before-after.gif" width="400">|<img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/diff.png" width="400">|
 
 
-### Bulging compensation demo:
+### Bulging compensation demo
 
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Leg.gif" width="600">
-
-# Warning:
-You will not see any effect in edit mode.<br>
-The scipt only works in play mode.<br>
-If you see no effect in play mode verify that you are using the right shader.
 
 ## Unity version
 The script was tested with following Unity versions:
 * **2020.1.0a13.1443** (earlier versions do not support `#pragma multi_compile` in compute shaders)
 
-## How to set up:
+## How to set up
 
 * Create a skinned character with `SkinnedMeshRenderer` component
 * Add `DualQuaternionSkinner.cs` component (it will require a `MeshFilter` component)
@@ -49,19 +44,18 @@ The script was tested with following Unity versions:
 
 If bulging is increased instead of decreased, select same axis with different direction (**X**&nbsp;=>&nbsp;**Negative&nbsp;X**)
 
-## Common problems
+### Common problems
 
 The script is programmed to automatically detect common setup problems. Check out the editor:
 
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Problems.png" width="363">
 
-## Known bugs
+### Warning
+You will not see any effect in edit mode.<br>
+The scipt only works in play mode.<br>
+If you see no effect in play mode verify that you are using the right shader.
 
-Must use [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) = [AlwaysAnimate](https://docs.unity3d.com/ScriptReference/AnimatorCullingMode.AlwaysAnimate.html) in [Animator](https://docs.unity3d.com/ScriptReference/Animator.html). Otherwise, the mesh is treated as permanently invisible.
-
-You can write a short script that will toggle [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) based on [visibility](https://docs.unity3d.com/ScriptReference/Renderer-isVisible.html) to get proper culling.
-
-## Why do i need SkinnedMeshRenderer?
+### Why do i need SkinnedMeshRenderer?
 
 My scripts uses `SkinnedMeshRenderer` to extract an array of bones from it. Yep, that's it.<br>
 The order of bones is unpredictable and does not depend on their hierarchy.<br>
@@ -69,17 +63,7 @@ Only SkinnedMeshRenderer knows it &nbsp;&nbsp; ¯\\\_(ツ)\_/¯
 
 After extracting the bone array in `Start()` my script disables `SkinnedMeshRenderer` component as it is no longer needed. All the animations are performed by the script. You can verify it in the editor after hitting play button.
 
-## Performance:
-
-During my testing the amount of time spent on actual skinning was negligible compared to the amount of time extracting `localToWorldMatrix` from every bone in the hierarchy.
-
-As long as you are not creating hundreds of characters with complex rigs (no matter the polycount) there should be no significant performance hit.
-
-If anyone knows how to optimize extracting `localToWorldMatrix` of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
-
-Works **A LOT** faster with IL2CPP, about 30% slower than built-in skinning in worst-case scenario according to my testing.
-
-## How do I use custom shaders?
+### How do I use custom shaders?
 
 Alas it's complicated.<br>
 I added comments to "Standard hacked for DQ skinning" marking the alterations i made to the Standard shader.<br>
@@ -88,6 +72,22 @@ You can try to do the same with your own shader to make it work with the script.
 Feel free to contact me in [this thread](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/) at unity forum if you need help.
 
 I would also like to hear about your projects that use my script and your experience with it.
+
+## Known bugs
+
+Must use [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) = [AlwaysAnimate](https://docs.unity3d.com/ScriptReference/AnimatorCullingMode.AlwaysAnimate.html) in [Animator](https://docs.unity3d.com/ScriptReference/Animator.html). Otherwise, the mesh is treated as permanently invisible.
+
+You can write a short script that will toggle [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) based on [visibility](https://docs.unity3d.com/ScriptReference/Renderer-isVisible.html) to get proper culling.
+
+## Performance
+
+During my testing the amount of time spent on actual skinning was negligible compared to the amount of time extracting `localToWorldMatrix` from every bone in the hierarchy.
+
+As long as you are not creating hundreds of characters with complex rigs (no matter the polycount) there should be no significant performance hit.
+
+If anyone knows how to optimize extracting `localToWorldMatrix` of the bones please create an [issue](https://github.com/ConstantineRudenko/DQ-skinning-for-Unity/issues) or message me on [unity forum](https://forum.unity.com/threads/dual-quaternion-skinning-for-unity.501245/).
+
+Works **A LOT** faster with IL2CPP, about 30% slower than built-in skinning in worst-case scenario according to my testing.
 
 ## API
 
