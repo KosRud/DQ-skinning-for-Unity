@@ -55,19 +55,20 @@ You will not see any effect in edit mode.<br>
 The scipt only works in play mode.<br>
 If you see no effect in play mode verify that you are using the right shader.
 
-## Known bugs
 
-Must use [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) = [AlwaysAnimate](https://docs.unity3d.com/ScriptReference/AnimatorCullingMode.AlwaysAnimate.html) in [Animator](https://docs.unity3d.com/ScriptReference/Animator.html). Otherwise, the mesh is treated as permanently invisible.
-
-You can write a short script that will toggle [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) based on [visibility](https://docs.unity3d.com/ScriptReference/Renderer-isVisible.html) to get proper culling.
-
-## Why do i need SkinnedMeshRenderer?
+### Why do i need SkinnedMeshRenderer?
 
 My scripts uses `SkinnedMeshRenderer` to extract an array of bones from it. Yep, that's it.<br>
 The order of bones is unpredictable and does not depend on their hierarchy.<br>
 Only SkinnedMeshRenderer knows it &nbsp;&nbsp; ¯\\\_(ツ)\_/¯
 
 After extracting the bone array in `Start()` my script disables `SkinnedMeshRenderer` component as it is no longer needed. All the animations are performed by the script. You can verify it in the editor after hitting play button.
+
+## Known bugs
+
+Must use [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) = [AlwaysAnimate](https://docs.unity3d.com/ScriptReference/AnimatorCullingMode.AlwaysAnimate.html) in [Animator](https://docs.unity3d.com/ScriptReference/Animator.html). Otherwise, the mesh is treated as permanently invisible.
+
+You can write a short script that will toggle [cullingMode](https://docs.unity3d.com/ScriptReference/Animator-cullingMode.html) based on [visibility](https://docs.unity3d.com/ScriptReference/Renderer-isVisible.html) to get proper culling.
 
 ## Performance
 
