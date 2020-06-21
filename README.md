@@ -19,11 +19,6 @@
 
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Leg.gif" width="600">
 
-# Warning:
-You will not see any effect in edit mode.<br>
-The scipt only works in play mode.<br>
-If you see no effect in play mode verify that you are using the right shader.
-
 ## Unity version
 The script was tested with following Unity versions:
 * **2020.1.0a13.1443** (earlier versions do not support `#pragma multi_compile` in compute shaders)
@@ -49,11 +44,16 @@ The script was tested with following Unity versions:
 
 If bulging is increased instead of decreased, select same axis with different direction (**X**&nbsp;=>&nbsp;**Negative&nbsp;X**)
 
-## Common problems
+### Common problems
 
 The script is programmed to automatically detect common setup problems. Check out the editor:
 
 <img src="https://raw.githubusercontent.com/ConstantineRudenko/DQ-skinning-for-Unity/master/Screenshots/Problems.png" width="363">
+
+### Warning:
+You will not see any effect in edit mode.<br>
+The scipt only works in play mode.<br>
+If you see no effect in play mode verify that you are using the right shader.
 
 ## Known bugs
 
