@@ -8,6 +8,10 @@
 * zero GC allocations per frame
 * original bulging compensation [method](#bulging-compensation-method)
 
+## Stargazers over time
+
+<img src="https://starchart.cc/ConstantineRudenko/DQ-skinning-for-Unity.svg" width="600">
+
 ### Comparison DQ vs built-in linear
 
 |Gif|Difference|
