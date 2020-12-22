@@ -26,6 +26,7 @@
 ## Unity version
 The script was tested with following Unity versions:
 * **2020.1.0a13.1443** (earlier versions do not support `#pragma multi_compile` in compute shaders)
+* **2020.2.0f1** (briefly tested - seems to work just fine)
 
 ## How to set up
 
