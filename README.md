@@ -100,8 +100,9 @@ Works **A LOT** faster with IL2CPP, about 30% slower than built-in skinning in w
 
 ## Future plans
 
-* Test/improve/optimize bulging compensation
-* Implement toggle for bulging compensation
+* Reduce numthreads for compatibility
+* Add instancing support
+* Allow controlling the strength of bulging compensation with a texture
 * Implement simple runtime switching between **DualQuaternionSkinned** and built-in [SkinnedMeshRenderer](https://docs.unity3d.com/Manual/class-SkinnedMeshRenderer.html)
 * Implement proper animation culling (see **known bugs**)
 * It might make sense to group the data from all instances of the script into one batch and run the compute shaders only once per frame regardless of how many animated characters you have
