@@ -109,7 +109,7 @@ If you have any questions, ideas, bug reports, or just want to discuss the scrip
 
 ## Bulging compensation method
 
-The bulging compensation method used is described in the [article](https://journals.khnu.km.ua/vestnik/pdf/tech/pdfbase/2020/2020_1/1-2020_(281).pdf#page=12).
+The bulging compensation method used is described in the [paper](https://journals.khnu.km.ua/vestnik/pdf/tech/pdfbase/2020/2020_1/1-2020_(281).pdf#page=12).
 
 **Notes:**
 * In formula (6) there is a mistake, **x** should be replaced by **w_2** (there is no variable named x)
