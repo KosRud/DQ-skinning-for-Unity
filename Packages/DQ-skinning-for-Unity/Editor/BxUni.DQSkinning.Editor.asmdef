@@ -1,0 +1,18 @@
+{
+    "name": "BxUni.DQSkinning.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:6e2b9d8b587b1bf459bf723188814456"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
