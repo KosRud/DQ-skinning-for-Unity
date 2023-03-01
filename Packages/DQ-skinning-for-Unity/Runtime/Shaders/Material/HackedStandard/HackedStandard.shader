@@ -1,17 +1,17 @@
 // Unity built-in shader source. Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
 
 /*
-	modified to use MadCake's dual quaternion skinning script
+    modified to use MadCake's dual quaternion skinning script
 
-	modifications marked by	comments:
-		// ----- DQ modification start -----
-		---inserted code---
-		// ----- DQ modification end -----
+    modifications marked by	comments:
+        // ----- DQ modification start -----
+        ---inserted code---
+        // ----- DQ modification end -----
 
-	modifications added to following passes:
-		- Forward
-		- ShadowCaster
-		- Deferred
+    modifications added to following passes:
+        - Forward
+        - ShadowCaster
+        - Deferred
 */
 
 Shader "MadCake/Material/Standard hacked for DQ skinning"
@@ -102,107 +102,107 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
             // Uncomment the following line to enable dithering LOD crossfade. Note: there are more in the file to uncomment for other passes.
             //#pragma multi_compile _ LOD_FADE_CROSSFADE
 
-			//#pragma vertex vertForwardBase
+            //#pragma vertex vertForwardBase
             #pragma fragment fragBase
             #include "UnityStandardCoreForward.cginc"
 
-			// ----- DQ modification start -----
+            // ----- DQ modification start -----
 
-			#pragma vertex vertSkinnedForward // original #pragma vertex (above) was commented
+            #pragma vertex vertSkinnedForward // original #pragma vertex (above) was commented
 
-			// expanded version of original vertex input structure
-			struct VertexInputSkinningForward
-			{
-				float4 vertex   : POSITION;
-				half3 normal    : NORMAL;
-				float2 uv0      : TEXCOORD0;
-				float2 uv1      : TEXCOORD1;
+            // expanded version of original vertex input structure
+            struct VertexInputSkinningForward
+            {
+                float4 vertex   : POSITION;
+                half3 normal    : NORMAL;
+                float2 uv0      : TEXCOORD0;
+                float2 uv1      : TEXCOORD1;
 
-				// this was added, everything else remains unchanged
-				uint id : SV_VertexID;
+                // this was added, everything else remains unchanged
+                uint id : SV_VertexID;
 
-				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-					float2 uv2      : TEXCOORD2;
-				#endif
+                #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                    float2 uv2      : TEXCOORD2;
+                #endif
 
-				#ifdef _TANGENT_TO_WORLD
-					half4 tangent   : TANGENT;
-				#endif
+                #ifdef _TANGENT_TO_WORLD
+                    half4 tangent   : TANGENT;
+                #endif
 
-				UNITY_VERTEX_INPUT_INSTANCE_ID
-			};
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
 
-			// variables used for skining, always the same for every pass
-			sampler2D skinned_data_1;
-			sampler2D skinned_data_2;
-			sampler2D skinned_data_3;
-			uint skinned_tex_height;
-			uint skinned_tex_width;
-			bool _DoSkinning;
+            // variables used for skining, always the same for every pass
+            sampler2D skinned_data_1;
+            sampler2D skinned_data_2;
+            sampler2D skinned_data_3;
+            uint skinned_tex_height;
+            uint skinned_tex_width;
+            bool _DoSkinning;
 
-			// the actual skinning function
-			// don't change the code but change the argument type to the name of vertex input structure used in current pass
-			// for this pass it is VertexInputSkinningForward
-			void vert(inout VertexInputSkinningForward v) {
-				if (_DoSkinning) {
-					float2 skinned_tex_uv;
+            // the actual skinning function
+            // don't change the code but change the argument type to the name of vertex input structure used in current pass
+            // for this pass it is VertexInputSkinningForward
+            void vert(inout VertexInputSkinningForward v) {
+                if (_DoSkinning) {
+                    float2 skinned_tex_uv;
 
-					skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
-					skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
+                    skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
+                    skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
 
-					float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
-					float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
+                    float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
+                    float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
 
-					#ifdef _TANGENT_TO_WORLD
-						float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
-					#endif
+                    #ifdef _TANGENT_TO_WORLD
+                        float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
+                    #endif
 
-					v.vertex.xyz = data_1.xyz;
-					v.vertex.w = 1;
+                    v.vertex.xyz = data_1.xyz;
+                    v.vertex.w = 1;
 
-					v.normal.x = data_1.w;
-					v.normal.yz = data_2.xy;
+                    v.normal.x = data_1.w;
+                    v.normal.yz = data_2.xy;
 
-					#ifdef _TANGENT_TO_WORLD
-						v.tangent.xy = data_2.zw;
-						v.tangent.zw = data_3.xy;
-					#endif
-				}
-			}
+                    #ifdef _TANGENT_TO_WORLD
+                        v.tangent.xy = data_2.zw;
+                        v.tangent.zw = data_3.xy;
+                    #endif
+                }
+            }
 
-			// this function will replace the original vertex function (vertForwardBase)
-			// the return type is the same as in the original function
-			// the argument type is our expanded structure
-			VertexOutputForwardBase vertSkinnedForward(VertexInputSkinningForward vs)
-			{
-				// first we apply skinning
-				vert(vs);
+            // this function will replace the original vertex function (vertForwardBase)
+            // the return type is the same as in the original function
+            // the argument type is our expanded structure
+            VertexOutputForwardBase vertSkinnedForward(VertexInputSkinningForward vs)
+            {
+                // first we apply skinning
+                vert(vs);
 
-				// then we create the original vertex structure (VertexInput for this pass)
-				// and fill it with the data from our expanded version
-				VertexInput v;
-				v.vertex = vs.vertex;
-				v.normal = vs.normal;
-				v.uv0 = vs.uv0;
-				v.uv1 = vs.uv1;
+                // then we create the original vertex structure (VertexInput for this pass)
+                // and fill it with the data from our expanded version
+                VertexInput v;
+                v.vertex = vs.vertex;
+                v.normal = vs.normal;
+                v.uv0 = vs.uv0;
+                v.uv1 = vs.uv1;
 
-				// this variable is inside an "if defined" block in original structure
-				// so accessing it should be enclosed in identical "if defined" block
-				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-					v.uv2 = vs.uv2;
-				#endif
+                // this variable is inside an "if defined" block in original structure
+                // so accessing it should be enclosed in identical "if defined" block
+                #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                    v.uv2 = vs.uv2;
+                #endif
 
-				// same here
-				#ifdef _TANGENT_TO_WORLD
-					v.tangent = vs.tangent;
-				#endif
+                // same here
+                #ifdef _TANGENT_TO_WORLD
+                    v.tangent = vs.tangent;
+                #endif
 
-				// finally we pass the original vertex structure to the original vertex function
-				// and return the result
-				return vertForwardBase(v);
-			}
+                // finally we pass the original vertex structure to the original vertex function
+                // and return the result
+                return vertForwardBase(v);
+            }
 
-			// ----- DQ modification end -----
+            // ----- DQ modification end -----
 
             ENDCG
         }
@@ -240,85 +240,85 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
             #pragma fragment fragAdd
             #include "UnityStandardCoreForward.cginc"
 
-			// ----- DQ modification start -----
+            // ----- DQ modification start -----
 
-			#pragma vertex vertSkinnedForwardAdd // original #pragma vertex (above) was commented
+            #pragma vertex vertSkinnedForwardAdd // original #pragma vertex (above) was commented
 
-			struct VertexInputSkinningForwardAdd
-			{
-				float4 vertex   : POSITION;
-				half3 normal    : NORMAL;
-				float2 uv0      : TEXCOORD0;
-				float2 uv1      : TEXCOORD1;
-				uint id : SV_VertexID;
+            struct VertexInputSkinningForwardAdd
+            {
+                float4 vertex   : POSITION;
+                half3 normal    : NORMAL;
+                float2 uv0      : TEXCOORD0;
+                float2 uv1      : TEXCOORD1;
+                uint id : SV_VertexID;
 
-				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-					float2 uv2      : TEXCOORD2;
-				#endif
+                #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                    float2 uv2      : TEXCOORD2;
+                #endif
 
-				#ifdef _TANGENT_TO_WORLD
-					half4 tangent   : TANGENT;
-				#endif
+                #ifdef _TANGENT_TO_WORLD
+                    half4 tangent   : TANGENT;
+                #endif
 
-				UNITY_VERTEX_INPUT_INSTANCE_ID
-			};
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
 
-			sampler2D skinned_data_1;
-			sampler2D skinned_data_2;
-			sampler2D skinned_data_3;
-			uint skinned_tex_height;
-			uint skinned_tex_width;
-			bool _DoSkinning;
+            sampler2D skinned_data_1;
+            sampler2D skinned_data_2;
+            sampler2D skinned_data_3;
+            uint skinned_tex_height;
+            uint skinned_tex_width;
+            bool _DoSkinning;
 
-			void vert(inout VertexInputSkinningForwardAdd v) {
-				if (_DoSkinning) {
-					float2 skinned_tex_uv;
+            void vert(inout VertexInputSkinningForwardAdd v) {
+                if (_DoSkinning) {
+                    float2 skinned_tex_uv;
 
-					skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
-					skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
+                    skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
+                    skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
 
-					float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
-					float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
+                    float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
+                    float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
 
-					#ifdef _TANGENT_TO_WORLD
-						float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
-					#endif
+                    #ifdef _TANGENT_TO_WORLD
+                        float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
+                    #endif
 
-					v.vertex.xyz = data_1.xyz;
-					v.vertex.w = 1;
+                    v.vertex.xyz = data_1.xyz;
+                    v.vertex.w = 1;
 
-					v.normal.x = data_1.w;
-					v.normal.yz = data_2.xy;
+                    v.normal.x = data_1.w;
+                    v.normal.yz = data_2.xy;
 
-					#ifdef _TANGENT_TO_WORLD
-						v.tangent.xy = data_2.zw;
-						v.tangent.zw = data_3.xy;
-					#endif
-				}
-			}
+                    #ifdef _TANGENT_TO_WORLD
+                        v.tangent.xy = data_2.zw;
+                        v.tangent.zw = data_3.xy;
+                    #endif
+                }
+            }
 
-			VertexOutputForwardAdd vertSkinnedForwardAdd(VertexInputSkinningForwardAdd vs)
-			{
-				vert(vs);
+            VertexOutputForwardAdd vertSkinnedForwardAdd(VertexInputSkinningForwardAdd vs)
+            {
+                vert(vs);
 
-				VertexInput v;
-				v.vertex = vs.vertex;
-				v.normal = vs.normal;
-				v.uv0 = vs.uv0;
-				v.uv1 = vs.uv1;
+                VertexInput v;
+                v.vertex = vs.vertex;
+                v.normal = vs.normal;
+                v.uv0 = vs.uv0;
+                v.uv1 = vs.uv1;
 
-				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-					v.uv2 = vs.uv2;
-				#endif
+                #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                    v.uv2 = vs.uv2;
+                #endif
 
-				#ifdef _TANGENT_TO_WORLD
-					v.tangent = vs.tangent;
-				#endif
+                #ifdef _TANGENT_TO_WORLD
+                    v.tangent = vs.tangent;
+                #endif
 
-				return vertAdd(v);
-			}
+                return vertAdd(v);
+            }
 
-			// ----- DQ modification end -----
+            // ----- DQ modification end -----
 
             ENDCG
         }
@@ -345,104 +345,104 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
             // Uncomment the following line to enable dithering LOD crossfade. Note: there are more in the file to uncomment for other passes.
             //#pragma multi_compile _ LOD_FADE_CROSSFADE
 
-			//#pragma vertex verthadowCaster
+            //#pragma vertex verthadowCaster
             #pragma fragment fragShadowCaster
 
             #include "UnityStandardShadow.cginc"
 
-			// ----- DQ modification start -----
+            // ----- DQ modification start -----
 
-			#pragma vertex vertSkinnedShadowCaster // original #pragma vertex (above) was commented
+            #pragma vertex vertSkinnedShadowCaster // original #pragma vertex (above) was commented
 
-			struct VertexInputSkinningShadowCaster
-			{
-				float4 vertex   : POSITION;
-				half3 normal    : NORMAL;
-				float2 uv0      : TEXCOORD0;
-				uint id : SV_VertexID;
+            struct VertexInputSkinningShadowCaster
+            {
+                float4 vertex   : POSITION;
+                half3 normal    : NORMAL;
+                float2 uv0      : TEXCOORD0;
+                uint id : SV_VertexID;
 
-				#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
-					half4 tangent   : TANGENT;
-				#endif
+                #if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
+                    half4 tangent   : TANGENT;
+                #endif
 
-				UNITY_VERTEX_INPUT_INSTANCE_ID
-			};
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
 
-			sampler2D skinned_data_1;
-			sampler2D skinned_data_2;
-			sampler2D skinned_data_3;
-			uint skinned_tex_height;
-			uint skinned_tex_width;
-			bool _DoSkinning;
+            sampler2D skinned_data_1;
+            sampler2D skinned_data_2;
+            sampler2D skinned_data_3;
+            uint skinned_tex_height;
+            uint skinned_tex_width;
+            bool _DoSkinning;
 
-			void vert(inout VertexInputSkinningShadowCaster v) {
-				if (_DoSkinning) {
-					float2 skinned_tex_uv;
+            void vert(inout VertexInputSkinningShadowCaster v) {
+                if (_DoSkinning) {
+                    float2 skinned_tex_uv;
 
-					skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
-					skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
+                    skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
+                    skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
 
-					float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
-					float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
+                    float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
+                    float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
 
-					#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
-						float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
-					#endif
+                    #if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
+                        float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
+                    #endif
 
-					v.vertex.xyz = data_1.xyz;
-					v.vertex.w = 1;
+                    v.vertex.xyz = data_1.xyz;
+                    v.vertex.w = 1;
 
-					v.normal.x = data_1.w;
-					v.normal.yz = data_2.xy;
+                    v.normal.x = data_1.w;
+                    v.normal.yz = data_2.xy;
 
-					#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
-						v.tangent.xy = data_2.zw;
-						v.tangent.zw = data_3.xy;
-					#endif
-				}
-			}
+                    #if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
+                        v.tangent.xy = data_2.zw;
+                        v.tangent.zw = data_3.xy;
+                    #endif
+                }
+            }
 
-			void vertSkinnedShadowCaster(
-				VertexInputSkinningShadowCaster vs,
-				out float4 opos : SV_POSITION
+            void vertSkinnedShadowCaster(
+                VertexInputSkinningShadowCaster vs,
+                out float4 opos : SV_POSITION
 
-				#ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
-					, out VertexOutputShadowCaster o
-				#endif
+                #ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
+                    , out VertexOutputShadowCaster o
+                #endif
 
-				#ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
-					, out VertexOutputStereoShadowCaster os
-				#endif
-			)
-			{
-				vert(vs);
+                #ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
+                    , out VertexOutputStereoShadowCaster os
+                #endif
+            )
+            {
+                vert(vs);
 
-				VertexInput v;
-				v.vertex = vs.vertex;
-				v.normal = vs.normal;
-				v.uv0 = vs.uv0;
+                VertexInput v;
+                v.vertex = vs.vertex;
+                v.normal = vs.normal;
+                v.uv0 = vs.uv0;
 
-				#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
-					v.tangent = vs.tangent;
-				#endif
+                #if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
+                    v.tangent = vs.tangent;
+                #endif
 
-				vertShadowCaster(
-					v,
-					opos
+                vertShadowCaster(
+                    v,
+                    opos
 
-					#ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
-						, o
-					#endif
+                    #ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
+                        , o
+                    #endif
 
-					#ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
-						, os
-					#endif
-				);
-			}
+                    #ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
+                        , os
+                    #endif
+                );
+            }
 
-			// ----- DQ modification end -----
+            // ----- DQ modification end -----
 
-			ENDCG
+            ENDCG
         }
         // ------------------------------------------------------------------
         //  Deferred pass
@@ -477,86 +477,86 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
             #include "UnityStandardCore.cginc"
 
-			// ----- DQ modification start -----
+            // ----- DQ modification start -----
 
-			#pragma vertex vertSkinnedDeferred // original #pragma vertex (above) was commented
+            #pragma vertex vertSkinnedDeferred // original #pragma vertex (above) was commented
 
-			struct VertexInputSkinningDeferred
-				{
-					float4 vertex   : POSITION;
-					half3 normal    : NORMAL;
-					float2 uv0      : TEXCOORD0;
-					float2 uv1      : TEXCOORD1;
-					uint id : SV_VertexID;
+            struct VertexInputSkinningDeferred
+                {
+                    float4 vertex   : POSITION;
+                    half3 normal    : NORMAL;
+                    float2 uv0      : TEXCOORD0;
+                    float2 uv1      : TEXCOORD1;
+                    uint id : SV_VertexID;
 
-					#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-						float2 uv2      : TEXCOORD2;
-					#endif
+                    #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                        float2 uv2      : TEXCOORD2;
+                    #endif
 
-					#ifdef _TANGENT_TO_WORLD
-						half4 tangent   : TANGENT;
-					#endif
-					
+                    #ifdef _TANGENT_TO_WORLD
+                        half4 tangent   : TANGENT;
+                    #endif
+                    
 
-					UNITY_VERTEX_INPUT_INSTANCE_ID
-				};
+                    UNITY_VERTEX_INPUT_INSTANCE_ID
+                };
 
-			sampler2D skinned_data_1;
-			sampler2D skinned_data_2;
-			sampler2D skinned_data_3;
-			uint skinned_tex_height;
-			uint skinned_tex_width;
-			bool _DoSkinning;
+            sampler2D skinned_data_1;
+            sampler2D skinned_data_2;
+            sampler2D skinned_data_3;
+            uint skinned_tex_height;
+            uint skinned_tex_width;
+            bool _DoSkinning;
 
-			void vert(inout VertexInputSkinningDeferred v) {
-				if (_DoSkinning) {
-					float2 skinned_tex_uv;
+            void vert(inout VertexInputSkinningDeferred v) {
+                if (_DoSkinning) {
+                    float2 skinned_tex_uv;
 
-					skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
-					skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
+                    skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
+                    skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
 
-					float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
-					float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
+                    float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
+                    float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
 
-					#ifdef _TANGENT_TO_WORLD
-						float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
-					#endif
+                    #ifdef _TANGENT_TO_WORLD
+                        float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
+                    #endif
 
-					v.vertex.xyz = data_1.xyz;
-					v.vertex.w = 1;
+                    v.vertex.xyz = data_1.xyz;
+                    v.vertex.w = 1;
 
-					v.normal.x = data_1.w;
-					v.normal.yz = data_2.xy;
+                    v.normal.x = data_1.w;
+                    v.normal.yz = data_2.xy;
 
-					#ifdef _TANGENT_TO_WORLD
-						v.tangent.xy = data_2.zw;
-						v.tangent.zw = data_3.xy;
-					#endif
-				}
-			}
+                    #ifdef _TANGENT_TO_WORLD
+                        v.tangent.xy = data_2.zw;
+                        v.tangent.zw = data_3.xy;
+                    #endif
+                }
+            }
 
-			VertexOutputDeferred vertSkinnedDeferred(VertexInputSkinningDeferred vs)
-			{
-				vert(vs);
+            VertexOutputDeferred vertSkinnedDeferred(VertexInputSkinningDeferred vs)
+            {
+                vert(vs);
 
-				VertexInput v;
-				v.vertex = vs.vertex;
-				v.normal = vs.normal;
-				v.uv0 = vs.uv0;
-				v.uv1 = vs.uv1;
+                VertexInput v;
+                v.vertex = vs.vertex;
+                v.normal = vs.normal;
+                v.uv0 = vs.uv0;
+                v.uv1 = vs.uv1;
 
-				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-					v.uv2 = vs.uv2;
-				#endif
+                #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                    v.uv2 = vs.uv2;
+                #endif
 
-				#ifdef _TANGENT_TO_WORLD
-					v.tangent = vs.tangent;
-				#endif
+                #ifdef _TANGENT_TO_WORLD
+                    v.tangent = vs.tangent;
+                #endif
 
-				return vertDeferred(v);
-			}
+                return vertDeferred(v);
+            }
 
-			// ----- DQ modification end -----
+            // ----- DQ modification end -----
 
             ENDCG
         }
@@ -583,86 +583,86 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
             #include "UnityStandardMeta.cginc"
 
-			// ----- DQ modification start -----
+            // ----- DQ modification start -----
 
-			#pragma vertex vertSkinnedMeta // original #pragma vertex (above) was commented
+            #pragma vertex vertSkinnedMeta // original #pragma vertex (above) was commented
 
-			struct VertexInputSkinningMeta
-				{
-					float4 vertex   : POSITION;
-					half3 normal    : NORMAL;
-					float2 uv0      : TEXCOORD0;
-					float2 uv1      : TEXCOORD1;
-					uint id : SV_VertexID;
+            struct VertexInputSkinningMeta
+                {
+                    float4 vertex   : POSITION;
+                    half3 normal    : NORMAL;
+                    float2 uv0      : TEXCOORD0;
+                    float2 uv1      : TEXCOORD1;
+                    uint id : SV_VertexID;
 
-					#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-						float2 uv2      : TEXCOORD2;
-					#endif
+                    #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                        float2 uv2      : TEXCOORD2;
+                    #endif
 
-					#ifdef _TANGENT_TO_WORLD
-						half4 tangent   : TANGENT;
-					#endif
+                    #ifdef _TANGENT_TO_WORLD
+                        half4 tangent   : TANGENT;
+                    #endif
 
 
-					UNITY_VERTEX_INPUT_INSTANCE_ID
-				};
+                    UNITY_VERTEX_INPUT_INSTANCE_ID
+                };
 
-			sampler2D skinned_data_1;
-			sampler2D skinned_data_2;
-			sampler2D skinned_data_3;
-			uint skinned_tex_height;
-			uint skinned_tex_width;
-			bool _DoSkinning;
+            sampler2D skinned_data_1;
+            sampler2D skinned_data_2;
+            sampler2D skinned_data_3;
+            uint skinned_tex_height;
+            uint skinned_tex_width;
+            bool _DoSkinning;
 
-			void vert(inout VertexInputSkinningMeta v) {
-				if (_DoSkinning) {
-					float2 skinned_tex_uv;
+            void vert(inout VertexInputSkinningMeta v) {
+                if (_DoSkinning) {
+                    float2 skinned_tex_uv;
 
-					skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
-					skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
+                    skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
+                    skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
 
-					float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
-					float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
+                    float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
+                    float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
 
-					#ifdef _TANGENT_TO_WORLD
-						float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
-					#endif
+                    #ifdef _TANGENT_TO_WORLD
+                        float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
+                    #endif
 
-					v.vertex.xyz = data_1.xyz;
-					v.vertex.w = 1;
+                    v.vertex.xyz = data_1.xyz;
+                    v.vertex.w = 1;
 
-					v.normal.x = data_1.w;
-					v.normal.yz = data_2.xy;
+                    v.normal.x = data_1.w;
+                    v.normal.yz = data_2.xy;
 
-					#ifdef _TANGENT_TO_WORLD
-						v.tangent.xy = data_2.zw;
-						v.tangent.zw = data_3.xy;
-					#endif
-				}
-			}
+                    #ifdef _TANGENT_TO_WORLD
+                        v.tangent.xy = data_2.zw;
+                        v.tangent.zw = data_3.xy;
+                    #endif
+                }
+            }
 
-			v2f_meta vertSkinnedMeta(VertexInputSkinningMeta vs)
-			{
-				vert(vs);
+            v2f_meta vertSkinnedMeta(VertexInputSkinningMeta vs)
+            {
+                vert(vs);
 
-				VertexInput v;
-				v.vertex = vs.vertex;
-				v.normal = vs.normal;
-				v.uv0 = vs.uv0;
-				v.uv1 = vs.uv1;
+                VertexInput v;
+                v.vertex = vs.vertex;
+                v.normal = vs.normal;
+                v.uv0 = vs.uv0;
+                v.uv1 = vs.uv1;
 
-				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-					v.uv2 = vs.uv2;
-				#endif
+                #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                    v.uv2 = vs.uv2;
+                #endif
 
-				#ifdef _TANGENT_TO_WORLD
-					v.tangent = vs.tangent;
-				#endif
+                #ifdef _TANGENT_TO_WORLD
+                    v.tangent = vs.tangent;
+                #endif
 
-				return vert_meta(v);
-			}
+                return vert_meta(v);
+            }
 
-			// ----- DQ modification end -----
+            // ----- DQ modification end -----
 
 
             ENDCG
@@ -706,84 +706,84 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
             #pragma fragment fragBase
             #include "UnityStandardCoreForward.cginc"
 
-			// ----- DQ modification start -----
+            // ----- DQ modification start -----
 
-			#pragma vertex vertSkinnedForward // original #pragma vertex (above) was commented
+            #pragma vertex vertSkinnedForward // original #pragma vertex (above) was commented
 
-			struct VertexInputSkinningForward
-			{
-				float4 vertex   : POSITION;
-				half3 normal    : NORMAL;
-				float2 uv0      : TEXCOORD0;
-				float2 uv1      : TEXCOORD1;
-				uint id : SV_VertexID;
+            struct VertexInputSkinningForward
+            {
+                float4 vertex   : POSITION;
+                half3 normal    : NORMAL;
+                float2 uv0      : TEXCOORD0;
+                float2 uv1      : TEXCOORD1;
+                uint id : SV_VertexID;
 
-				#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-					float2 uv2      : TEXCOORD2;
-				#endif
+                #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                    float2 uv2      : TEXCOORD2;
+                #endif
 
-				#ifdef _TANGENT_TO_WORLD
-					half4 tangent   : TANGENT;
-				#endif
-				
+                #ifdef _TANGENT_TO_WORLD
+                    half4 tangent   : TANGENT;
+                #endif
+                
 
-				UNITY_VERTEX_INPUT_INSTANCE_ID
-			};
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
 
-			sampler2D skinned_data_1;
-			sampler2D skinned_data_2;
-			sampler2D skinned_data_3;
-			uint skinned_tex_height;
-			uint skinned_tex_width;
-			bool _DoSkinning;
+            sampler2D skinned_data_1;
+            sampler2D skinned_data_2;
+            sampler2D skinned_data_3;
+            uint skinned_tex_height;
+            uint skinned_tex_width;
+            bool _DoSkinning;
 
-			void vert(inout VertexInputSkinningForward v) {
-				if (_DoSkinning) {
-					float2 skinned_tex_uv;
+            void vert(inout VertexInputSkinningForward v) {
+                if (_DoSkinning) {
+                    float2 skinned_tex_uv;
 
-					skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
-					skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
+                    skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
+                    skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
 
-					float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
-					float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
+                    float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
+                    float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
 
-					#ifdef _TANGENT_TO_WORLD
-						float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
-					#endif
+                    #ifdef _TANGENT_TO_WORLD
+                        float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
+                    #endif
 
-					v.vertex.xyz = data_1.xyz;
-					v.vertex.w = 1;
+                    v.vertex.xyz = data_1.xyz;
+                    v.vertex.w = 1;
 
-					v.normal.x = data_1.w;
-					v.normal.yz = data_2.xy;
+                    v.normal.x = data_1.w;
+                    v.normal.yz = data_2.xy;
 
-					#ifdef _TANGENT_TO_WORLD
-						v.tangent.xy = data_2.zw;
-						v.tangent.zw = data_3.xy;
-					#endif
-				}
-			}
+                    #ifdef _TANGENT_TO_WORLD
+                        v.tangent.xy = data_2.zw;
+                        v.tangent.zw = data_3.xy;
+                    #endif
+                }
+            }
 
-			VertexOutputForwardBase vertSkinnedForward(VertexInputSkinningForward vs)
-			{
-				vert(vs);
+            VertexOutputForwardBase vertSkinnedForward(VertexInputSkinningForward vs)
+            {
+                vert(vs);
 
-				VertexInput v;
-				v.vertex = vs.vertex;
-				v.normal = vs.normal;
-				v.uv0 = vs.uv0;
-				v.uv1 = vs.uv1;
-			#if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-				v.uv2 = vs.uv2;
-			#endif
+                VertexInput v;
+                v.vertex = vs.vertex;
+                v.normal = vs.normal;
+                v.uv0 = vs.uv0;
+                v.uv1 = vs.uv1;
+            #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
+                v.uv2 = vs.uv2;
+            #endif
 
-			#ifdef _TANGENT_TO_WORLD
-				v.tangent = vs.tangent;
-			#endif
-				return vertForwardBase(v);
-			}
+            #ifdef _TANGENT_TO_WORLD
+                v.tangent = vs.tangent;
+            #endif
+                return vertForwardBase(v);
+            }
 
-			// ----- DQ modification end -----
+            // ----- DQ modification end -----
 
             ENDCG
         }
@@ -841,97 +841,97 @@ Shader "MadCake/Material/Standard hacked for DQ skinning"
 
             #include "UnityStandardShadow.cginc"
 
-			// ----- DQ modification start -----
+            // ----- DQ modification start -----
 
-			#pragma vertex vertSkinnedShadowCaster // original #pragma vertex (above) was commented
+            #pragma vertex vertSkinnedShadowCaster // original #pragma vertex (above) was commented
 
-			struct VertexInputSkinningShadowCaster
-			{
-				float4 vertex   : POSITION;
-				half3 normal    : NORMAL;
-				float2 uv0      : TEXCOORD0;
-				uint id : SV_VertexID;
+            struct VertexInputSkinningShadowCaster
+            {
+                float4 vertex   : POSITION;
+                half3 normal    : NORMAL;
+                float2 uv0      : TEXCOORD0;
+                uint id : SV_VertexID;
 
-				#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
-					half4 tangent   : TANGENT;
-				#endif
+                #if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
+                    half4 tangent   : TANGENT;
+                #endif
 
-				UNITY_VERTEX_INPUT_INSTANCE_ID
-			};
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
 
-			sampler2D skinned_data_1;
-			sampler2D skinned_data_2;
-			sampler2D skinned_data_3;
-			uint skinned_tex_height;
-			uint skinned_tex_width;
-			bool _DoSkinning;
+            sampler2D skinned_data_1;
+            sampler2D skinned_data_2;
+            sampler2D skinned_data_3;
+            uint skinned_tex_height;
+            uint skinned_tex_width;
+            bool _DoSkinning;
 
-			void vert(inout VertexInputSkinningShadowCaster v) {
-				if (_DoSkinning) {
-					float2 skinned_tex_uv;
+            void vert(inout VertexInputSkinningShadowCaster v) {
+                if (_DoSkinning) {
+                    float2 skinned_tex_uv;
 
-					skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
-					skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
+                    skinned_tex_uv.x = (float(v.id % skinned_tex_width)) / skinned_tex_width;
+                    skinned_tex_uv.y = (float(v.id / skinned_tex_width)) / skinned_tex_height;
 
-					float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
-					float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
+                    float4 data_1 = tex2Dlod(skinned_data_1, float4(skinned_tex_uv, 0, 0));
+                    float4 data_2 = tex2Dlod(skinned_data_2, float4(skinned_tex_uv, 0, 0));
 
-					#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
-						float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
-					#endif
+                    #if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
+                        float2 data_3 = tex2Dlod(skinned_data_3, float4(skinned_tex_uv, 0, 0)).xy;
+                    #endif
 
-					v.vertex.xyz = data_1.xyz;
-					v.vertex.w = 1;
+                    v.vertex.xyz = data_1.xyz;
+                    v.vertex.w = 1;
 
-					v.normal.x = data_1.w;
-					v.normal.yz = data_2.xy;
+                    v.normal.x = data_1.w;
+                    v.normal.yz = data_2.xy;
 
-					#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
-						v.tangent.xy = data_2.zw;
-						v.tangent.zw = data_3.xy;
-					#endif
-				}
-			}
+                    #if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
+                        v.tangent.xy = data_2.zw;
+                        v.tangent.zw = data_3.xy;
+                    #endif
+                }
+            }
 
-			void vertSkinnedShadowCaster(
-				VertexInputSkinningShadowCaster vs,
-				out float4 opos : SV_POSITION
+            void vertSkinnedShadowCaster(
+                VertexInputSkinningShadowCaster vs,
+                out float4 opos : SV_POSITION
 
-				#ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
-					, out VertexOutputShadowCaster o
-				#endif
+                #ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
+                    , out VertexOutputShadowCaster o
+                #endif
 
-				#ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
-					, out VertexOutputStereoShadowCaster os
-				#endif
-			)
-			{
-				vert(vs);
+                #ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
+                    , out VertexOutputStereoShadowCaster os
+                #endif
+            )
+            {
+                vert(vs);
 
-				VertexInput v;
-				v.vertex = vs.vertex;
-				v.normal = vs.normal;
-				v.uv0 = vs.uv0;
+                VertexInput v;
+                v.vertex = vs.vertex;
+                v.normal = vs.normal;
+                v.uv0 = vs.uv0;
 
-				#if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
-					v.tangent = vs.tangent;
-				#endif
+                #if defined(UNITY_STANDARD_USE_SHADOW_UVS) && defined(_PARALLAXMAP)
+                    v.tangent = vs.tangent;
+                #endif
 
-				vertShadowCaster(
-					v,
-					opos
+                vertShadowCaster(
+                    v,
+                    opos
 
-					#ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
-						, o
-					#endif
+                    #ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
+                        , o
+                    #endif
 
-					#ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
-						, os
-					#endif
-				);
-			}
+                    #ifdef UNITY_STANDARD_USE_STEREO_SHADOW_OUTPUT_STRUCT
+                        , os
+                    #endif
+                );
+            }
 
-			// ----- DQ modification end -----
+            // ----- DQ modification end -----
 
             ENDCG
         }
