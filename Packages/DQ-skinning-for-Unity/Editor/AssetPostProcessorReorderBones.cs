@@ -6,20 +6,19 @@ using UnityEngine;
 #if UNITY_EDITOR
 
 /// <summary>
-/// Sorts bone indexes in imported meshes.
-/// <br>
+/// Sorts bone indexes in imported meshes.<br />
 /// SkinnedMeshRenderer requires bone indexes to be sorted based on hierarchy.
 /// </summary>
 public class AssetPostProcessorReorderBones : AssetPostprocessor
 {
     private void OnPostprocessModel(GameObject g)
     {
-        this.Process(g);
+        Process(g);
     }
 
     private void Process(GameObject g)
     {
-        SkinnedMeshRenderer smr = g.GetComponentInChildren<SkinnedMeshRenderer>();
+        var smr = g.GetComponentInChildren<SkinnedMeshRenderer>();
         if (smr == null)
         {
             Debug.LogWarning($"Unable to find Renderer [{g.name}]");
@@ -33,8 +32,9 @@ public class AssetPostProcessorReorderBones : AssetPostprocessor
         boneTransforms.Sort(CompareTransform);
 
         //record bone index mappings (richardf advice)
-        //build a Dictionary<int, int> that records the old bone index => new bone index mappings,
-        //then run through every vertex and just do boneIndexN = dict[boneIndexN] for each weight on each vertex.
+        //build a Dictionary<int, int> that records the old bone index =>
+        //new bone index mappings, then run through every vertex and
+        //just do boneIndexN = dict[boneIndexN] for each weight on each vertex.
         var remap = new Dictionary<int, int>();
         for (int i = 0; i < smr.bones.Length; i++)
         {
@@ -42,7 +42,7 @@ public class AssetPostProcessorReorderBones : AssetPostprocessor
         }
 
         //remap bone weight indexes
-        BoneWeight[] bw = smr.sharedMesh.boneWeights;
+        var bw = smr.sharedMesh.boneWeights;
         for (int i = 0; i < bw.Length; i++)
         {
             bw[i].boneIndex0 = remap[bw[i].boneIndex0];
@@ -59,9 +59,9 @@ public class AssetPostProcessorReorderBones : AssetPostprocessor
         }
 
         //assign new data
-        smr.bones                  = boneTransforms.ToArray();
+        smr.bones = boneTransforms.ToArray();
         smr.sharedMesh.boneWeights = bw;
-        smr.sharedMesh.bindposes   = bp;
+        smr.sharedMesh.bindposes = bp;
     }
 
     private static int CompareTransform(Transform A, Transform B)

@@ -34,40 +34,41 @@ RWTexture2D<float2> skinned_data_3;
 
 RWStructuredBuffer<float4> bone_directions;
 
-struct vertex_info SkinVertex(struct vertex_info vertinfo)
+vertex_info SkinVertex(vertex_info vertinfo)
 {
-    int4 bone_indexes	= vertinfo.bone_indexes;
-    float4 bone_weights	= vertinfo.bone_weights;
+    const int4 bone_indexes   = vertinfo.bone_indexes;
+    const float4 bone_weights = vertinfo.bone_weights;
 
-    struct dual_quaternion dq0 = skinned_dual_quaternions.Load(bone_indexes[0]);
-    struct dual_quaternion dq1 = skinned_dual_quaternions.Load(bone_indexes[1]);
-    struct dual_quaternion dq2 = skinned_dual_quaternions.Load(bone_indexes[2]);
-    struct dual_quaternion dq3 = skinned_dual_quaternions.Load(bone_indexes[3]);
+    const dual_quaternion dq0 = skinned_dual_quaternions.Load(bone_indexes[0]);
+    dual_quaternion dq1 = skinned_dual_quaternions.Load(bone_indexes[1]);
+    dual_quaternion dq2 = skinned_dual_quaternions.Load(bone_indexes[2]);
+    dual_quaternion dq3 = skinned_dual_quaternions.Load(bone_indexes[3]);
 
     dq1 = DualQuaternionShortestPath(dq1, dq0);
     dq2 = DualQuaternionShortestPath(dq2, dq0);
     dq3 = DualQuaternionShortestPath(dq3, dq0);
 
-    struct dual_quaternion skinned_dq;
-    skinned_dq.rotation_quaternion =	dq0.rotation_quaternion * bone_weights[0];
-    skinned_dq.rotation_quaternion +=	dq1.rotation_quaternion * bone_weights[1];
-    skinned_dq.rotation_quaternion +=	dq2.rotation_quaternion * bone_weights[2];
-    skinned_dq.rotation_quaternion +=	dq3.rotation_quaternion * bone_weights[3];
+    dual_quaternion skinned_dq;
+    skinned_dq.rotation_quaternion =  dq0.rotation_quaternion * bone_weights[0];
+    skinned_dq.rotation_quaternion += dq1.rotation_quaternion * bone_weights[1];
+    skinned_dq.rotation_quaternion += dq2.rotation_quaternion * bone_weights[2];
+    skinned_dq.rotation_quaternion += dq3.rotation_quaternion * bone_weights[3];
 
-    skinned_dq.translation_quaternion =		dq0.translation_quaternion * bone_weights[0];
-    skinned_dq.translation_quaternion +=	dq1.translation_quaternion * bone_weights[1];
-    skinned_dq.translation_quaternion +=	dq2.translation_quaternion * bone_weights[2];
-    skinned_dq.translation_quaternion +=	dq3.translation_quaternion * bone_weights[3];
+    skinned_dq.translation_quaternion =  dq0.translation_quaternion * bone_weights[0];
+    skinned_dq.translation_quaternion += dq1.translation_quaternion * bone_weights[1];
+    skinned_dq.translation_quaternion += dq2.translation_quaternion * bone_weights[2];
+    skinned_dq.translation_quaternion += dq3.translation_quaternion * bone_weights[3];
 
-    float mag = length(skinned_dq.rotation_quaternion);
-    skinned_dq.rotation_quaternion		/= mag;
-    skinned_dq.translation_quaternion	/= mag;
+    const float mag = length(skinned_dq.rotation_quaternion);
+    skinned_dq.rotation_quaternion    /= mag;
+    skinned_dq.translation_quaternion /= mag;
 
-    vertinfo.position	= QuaternionApplyRotation(vertinfo.position,	skinned_dq.rotation_quaternion);
-    vertinfo.normal		= QuaternionApplyRotation(vertinfo.normal,		skinned_dq.rotation_quaternion);
-    vertinfo.tangent	= QuaternionApplyRotation(vertinfo.tangent,		skinned_dq.rotation_quaternion);
+    vertinfo.position = QuaternionApplyRotation(vertinfo.position, skinned_dq.rotation_quaternion);
+    vertinfo.normal   = QuaternionApplyRotation(vertinfo.normal,   skinned_dq.rotation_quaternion);
+    vertinfo.tangent  = QuaternionApplyRotation(vertinfo.tangent,  skinned_dq.rotation_quaternion);
 
-    vertinfo.position += QuaternionMultiply(skinned_dq.translation_quaternion * 2, QuaternionInvert(skinned_dq.rotation_quaternion));
+    vertinfo.position += QuaternionMultiply(skinned_dq.translation_quaternion * 2,
+        QuaternionInvert(skinned_dq.rotation_quaternion));
     vertinfo.normal = normalize(vertinfo.normal);
     vertinfo.tangent = normalize(vertinfo.tangent);
 
@@ -76,20 +77,20 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
     float4 rq = QuaternionMultiply(dq0.rotation_quaternion, QuaternionInvert(dq1.rotation_quaternion));
 
     // branching is removed by the compiler optimization
-    if((bone_weights[1] != 0.0 && length(rq.xyz) > 0.001))
+    if (bone_weights[1] != 0.0 && length(rq.xyz) > 0.001)
     {
         float4 boneDir0 = bone_directions.Load(bone_indexes[0]);
         float4 boneDir1 = bone_directions.Load(bone_indexes[1]);
 
-        float3 axis = normalize(rq.xyz);
+        const float3 axis = normalize(rq.xyz);
         float3 bisector = normalize(boneDir0.xyz + boneDir1.xyz);
         bisector = bone_indexes[0] > bone_indexes[1] ? bisector : -bisector;
 
-        float3 offset = bisector - axis * dot(axis, bisector);
+        const float3 offset = bisector - axis * dot(axis, bisector);
 
         float angleCoef = saturate(2.0*sqrt(1.0-rq.w));
 
-        float x = bone_weights[1] / (bone_weights[0] + bone_weights[1]);
+        const float x = bone_weights[1] / (bone_weights[0] + bone_weights[1]);
         float compensation = 2.2*x-9.6*x*x+10.4*x*x*x;
 
         compensation *= vertinfo.compensation_coef;
@@ -105,17 +106,17 @@ struct vertex_info SkinVertex(struct vertex_info vertinfo)
 }
 
 [numthreads(1024,1,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+void CSMain(uint3 id : SV_DispatchThreadID)
 {
     int2 pos;
     pos.x = id.x % textureWidth;
     pos.y = id.x / textureWidth;
 
-    struct vertex_info vertinfo = vertex_infos.Load(id.x);
+    vertex_info vert_info = vertex_infos.Load(id.x);
 
-    vertinfo = SkinVertex(vertinfo);
+    vert_info = SkinVertex(vert_info);
 
-    skinned_data_1[pos] = float4(vertinfo.position.xyz, vertinfo.normal.x);
-    skinned_data_2[pos] = float4(vertinfo.normal.yz, vertinfo.tangent.xy);
-    skinned_data_3[pos] = vertinfo.tangent.zw;
+    skinned_data_1[pos] = float4(vert_info.position.xyz, vert_info.normal.x);
+    skinned_data_2[pos] = float4(vert_info.normal.yz, vert_info.tangent.xy);
+    skinned_data_3[pos] = vert_info.tangent.zw;
 }

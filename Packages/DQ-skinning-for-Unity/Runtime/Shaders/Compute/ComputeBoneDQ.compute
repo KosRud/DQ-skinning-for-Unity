@@ -29,18 +29,18 @@ float4 boneOrientation;
 [numthreads(1024,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    struct dual_quaternion dq_bind;
-    dq_bind	= bind_dual_quaternions.Load(id.x);
-    dq_bind.translation_quaternion = QuaternionMultiply(dq_bind.translation_quaternion,	dq_bind.rotation_quaternion) * 0.5;
+    dual_quaternion dq_bind = bind_dual_quaternions.Load(id.x);
+    dq_bind.translation_quaternion =
+        QuaternionMultiply(dq_bind.translation_quaternion,	dq_bind.rotation_quaternion) * 0.5;
 
     float4x4 pose_matrix = transpose(pose_matrices.Load(id.x));
     pose_matrix = mul(self_matrix, pose_matrix);
 
-    struct dual_quaternion dq_pose = DualQuaternionFromMatrix4x4(pose_matrix);
-    struct dual_quaternion dq_skinned = DualQuaternionMultiply(dq_pose, dq_bind);
+    const dual_quaternion dq_pose = DualQuaternionFromMatrix4x4(pose_matrix);
+    const dual_quaternion dq_skinned = DualQuaternionMultiply(dq_pose, dq_bind);
 
-    skinned_dual_quaternions[id.x].rotation_quaternion		= dq_skinned.rotation_quaternion;
-    skinned_dual_quaternions[id.x].translation_quaternion	= dq_skinned.translation_quaternion;
+    skinned_dual_quaternions[id.x].rotation_quaternion    = dq_skinned.rotation_quaternion;
+    skinned_dual_quaternions[id.x].translation_quaternion = dq_skinned.translation_quaternion;
     
     bone_directions[id.x] = QuaternionApplyRotation(boneOrientation, dq_pose.rotation_quaternion);
 }

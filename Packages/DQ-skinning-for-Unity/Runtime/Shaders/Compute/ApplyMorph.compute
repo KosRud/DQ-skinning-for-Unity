@@ -31,12 +31,12 @@ float weight;
 [numthreads(1024, 1, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-    struct vertex_info vertinfo = source.Load(id.x);
-    struct morph_delta morphinfo = delta.Load(id.x);
+    vertex_info vert_info = source.Load(id.x);
+    const morph_delta morph_info = delta.Load(id.x);
 
-    vertinfo.position	+= morphinfo.position	* weight;
-    vertinfo.normal		+= morphinfo.normal		* weight;
-    vertinfo.tangent	+= morphinfo.tangent	* weight;
+    vert_info.position += morph_info.position * weight;
+    vert_info.normal   += morph_info.normal   * weight;
+    vert_info.tangent  += morph_info.tangent  * weight;
 
-    target[id.x] = vertinfo;
+    target[id.x] = vert_info;
 }

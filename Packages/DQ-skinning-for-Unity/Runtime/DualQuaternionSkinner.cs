@@ -1,17 +1,15 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Replaces Unity's default linear skinning with DQ skinning
 /// Add this component to a <a class="bold" href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</a>
-/// that has
-/// <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a>
-/// attached.
-/// <br>
-/// Do not remove
-/// <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a>
-/// component!
-/// <br>
+/// that has <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a>
+/// attached.<br />
+/// Do not remove <a class="bold" href="https://docs.unity3d.com/ScriptReference/SkinnedMeshRenderer.html">SkinnedMeshRenderer</a>
+/// component!<br />
 /// Make sure that all materials of the animated object are using shader \"
 /// <b>MadCake/Material/Standard hacked for DQ skinning</b>\"
 /// </summary>
@@ -19,14 +17,14 @@ using UnityEngine;
 public class DualQuaternionSkinner : MonoBehaviour
 {
     /// <summary>
-    /// Bone orientation is required for bulge-compensation.
-    /// <br>
+    /// Bone orientation is required for bulge-compensation.<br />
     /// Do not set directly, use custom editor instead.
     /// </summary>
-    public Vector3 boneOrientationVector = Vector3.up;
+    public Vector3 m_boneOrientationVector = Vector3.up;
 
-    private bool viewFrustrumCulling = true;
+    private bool m_viewFrustumCulling = true;
 
+    [SuppressMessage("ReSharper", "NotAccessedField.Local")]
     private struct VertexInfo
     {
         // could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
@@ -49,6 +47,7 @@ public class DualQuaternionSkinner : MonoBehaviour
         public float compensation_coef;
     }
 
+    [SuppressMessage("ReSharper", "NotAccessedField.Local")]
     private struct MorphDelta
     {
         // could use float3 instead of float4 but NVidia says structures not aligned to 128 bits are slow
@@ -59,99 +58,100 @@ public class DualQuaternionSkinner : MonoBehaviour
         public Vector4 tangent;
     }
 
+    [SuppressMessage("ReSharper", "NotAccessedField.Local")]
     private struct DualQuaternion
     {
         public Quaternion rotationQuaternion;
         public Vector4    position;
     }
 
-    private const int numthreads   = 1024; // must be same in compute shader code
-    private const int textureWidth = 1024; // no need to adjust compute shaders
+    private const int k_numthreads   = 1024; // must be same in compute shader code
+    private const int k_textureWidth = 1024; // no need to adjust compute shaders
 
     /// <summary>
     /// Adjusts the amount of bulge-compensation.
     /// </summary>
     [Range(0, 1)]
-    public float bulgeCompensation;
+    public float m_bulgeCompensation;
 
-    public ComputeShader shaderComputeBoneDQ;
-    public ComputeShader shaderDQBlend;
-    public ComputeShader shaderApplyMorph;
+    public ComputeShader m_shaderComputeBoneDq;
+    public ComputeShader m_shaderDqBlend;
+    public ComputeShader m_shaderApplyMorph;
 
     /// <summary>
     /// Indicates whether DualQuaternionSkinner is currently active.
     /// </summary>
-    public bool started { get; private set; }
+    public bool Started { get; private set; }
 
-    private Matrix4x4[] poseMatrices;
+    private Matrix4x4[] m_poseMatrices;
 
-    private ComputeBuffer bufPoseMatrices;
-    private ComputeBuffer bufSkinnedDq;
-    private ComputeBuffer bufBindDq;
+    private ComputeBuffer m_bufPoseMatrices;
+    private ComputeBuffer m_bufSkinnedDq;
+    private ComputeBuffer m_bufBindDq;
 
-    private ComputeBuffer bufVertInfo;
-    private ComputeBuffer bufMorphTemp_1;
-    private ComputeBuffer bufMorphTemp_2;
+    private ComputeBuffer m_bufVertInfo;
+    private ComputeBuffer m_bufMorphTemp1;
+    private ComputeBuffer m_bufMorphTemp2;
 
-    private ComputeBuffer bufBoneDirections;
+    private ComputeBuffer m_bufBoneDirections;
 
-    private ComputeBuffer[] arrBufMorphDeltas;
+    private ComputeBuffer[] m_arrBufMorphDeltas;
 
-    private float[] morphWeights;
+    private float[] m_morphWeights;
 
-    private MeshFilter mf
+    private MeshFilter MeshFilter
     {
         get
         {
-            if (this._mf == null)
+            if (m_meshFilter == null)
             {
-                this._mf = this.GetComponent<MeshFilter>();
+                m_meshFilter = GetComponent<MeshFilter>();
             }
 
-            return this._mf;
+            return m_meshFilter;
         }
     }
 
-    private MeshFilter _mf;
+    private MeshFilter m_meshFilter;
 
-    private MeshRenderer mr
+    private MeshRenderer MeshRenderer
     {
         get
         {
-            if (this._mr == null)
+            if (m_meshRenderer == null)
             {
-                this._mr = this.GetComponent<MeshRenderer>();
-                if (this._mr == null)
+                m_meshRenderer = GetComponent<MeshRenderer>();
+                if (m_meshRenderer == null)
                 {
-                    this._mr = this.gameObject.AddComponent<MeshRenderer>();
+                    m_meshRenderer = gameObject.AddComponent<MeshRenderer>();
                 }
             }
 
-            return this._mr;
+            return m_meshRenderer;
         }
     }
 
-    private MeshRenderer _mr;
+    private MeshRenderer m_meshRenderer;
 
-    private SkinnedMeshRenderer smr
+    private SkinnedMeshRenderer SkinnedMeshRenderer
     {
         get
         {
-            if (this._smr == null)
+            if (m_skinnedMeshRenderer == null)
             {
-                this._smr = this.GetComponent<SkinnedMeshRenderer>();
+                m_skinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();
             }
 
-            return this._smr;
+            return m_skinnedMeshRenderer;
         }
     }
 
-    private SkinnedMeshRenderer _smr;
+    private SkinnedMeshRenderer m_skinnedMeshRenderer;
 
-    private MaterialPropertyBlock materialPropertyBlock;
+    private MaterialPropertyBlock m_materialPropertyBlock;
 
-    private Transform[] bones;
-    private Matrix4x4[] bindPoses;
+    private Transform[] m_bones;
+    private Matrix4x4[] m_bindPoses;
 
     /*
         Vulkan and OpenGL only support ComputeBuffer in compute shaders
@@ -164,31 +164,30 @@ public class DualQuaternionSkinner : MonoBehaviour
             rtSkinnedData_2			float4			normal.yz,	tangent.xy
             rtSkinnedData_3			float2			tangent.zw
     */
-    private RenderTexture rtSkinnedData_1;
-    private RenderTexture rtSkinnedData_2;
-    private RenderTexture rtSkinnedData_3;
+    private RenderTexture m_rtSkinnedData1;
+    private RenderTexture m_rtSkinnedData2;
+    private RenderTexture m_rtSkinnedData3;
 
-    private int kernelHandleComputeBoneDQ;
-    private int kernelHandleDQBlend;
-    private int kernelHandleApplyMorph;
+    private int m_kernelHandleComputeBoneDq;
+    private int m_kernelHandleDqBlend;
+    private int m_kernelHandleApplyMorph;
 
     /// <summary>
-    /// Enable or disable view frustrum culling.
-    /// <br>
+    /// Enable or disable view frustum culling.<br />
     /// When moving the bones manually to test the script, bounding box does not update (it is pre-calculated based on available animations), which may lead to improper culling.
     /// </summary>
-    public void SetViewFrustrumCulling(bool viewFrustrumculling)
+    public void SetViewFrustumCulling(bool viewFrustrumculling)
     {
-        if (this.viewFrustrumCulling == viewFrustrumculling)
+        if (m_viewFrustumCulling == viewFrustrumculling)
         {
             return;
         }
 
-        this.viewFrustrumCulling = viewFrustrumculling;
+        m_viewFrustumCulling = viewFrustrumculling;
 
-        if (this.started)
+        if (Started)
         {
-            this.UpdateViewFrustrumCulling();
+            UpdateViewFrustumCulling();
         }
     }
 
@@ -196,137 +195,127 @@ public class DualQuaternionSkinner : MonoBehaviour
     /// Returns current state of view frustrum culling.
     /// </summary>
     /// <returns>Current state of view frustrum culling (true = enabled, false = disabled)</returns>
-    public bool GetViewFrustrumCulling()
+    public bool GetViewFrustumCulling()
     {
-        return this.viewFrustrumCulling;
+        return m_viewFrustumCulling;
     }
 
-    private void UpdateViewFrustrumCulling()
+    private void UpdateViewFrustumCulling()
     {
-        if (this.viewFrustrumCulling)
+        if (m_viewFrustumCulling)
         {
-            this.mf.sharedMesh.bounds = this.smr.localBounds;
+            MeshFilter.sharedMesh.bounds = SkinnedMeshRenderer.localBounds;
         }
         else
         {
-            this.mf.sharedMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000000);
+            MeshFilter.sharedMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000000);
         }
     }
 
     /// <summary>
-    /// Returns an array of currently applied blend shape weights.
-    /// <br>
-    /// Default range is 0-100.
-    /// <br>
+    /// Returns an array of currently applied blend shape weights.<br />
+    /// Default range is 0-100.<br />
     /// It is possible to apply negative weights or exceeding 100.
     /// </summary>
     /// <returns>Array of currently applied blend shape weights</returns>
     public float[] GetBlendShapeWeights()
     {
-        float[] weights = new float[this.morphWeights.Length];
+        float[] weights = new float[m_morphWeights.Length];
         for (int i = 0; i < weights.Length; i++)
         {
-            weights[i] = this.morphWeights[i];
+            weights[i] = m_morphWeights[i];
         }
 
         return weights;
     }
 
     /// <summary>
-    /// Applies blend shape weights from the given array.
-    /// <br>
-    /// Default range is 0-100.
-    /// <br>
+    /// Applies blend shape weights from the given array.<br />
+    /// Default range is 0-100.<br />
     /// It is possible to apply negative weights or exceeding 100.
     /// </summary>
     /// <param name="weights">An array of weights to be applied</param>
     public void SetBlendShapeWeights(float[] weights)
     {
-        if (weights.Length != this.morphWeights.Length)
+        if (weights.Length != m_morphWeights.Length)
         {
             throw new ArgumentException(
                 "An array of weights must contain the number of elements " +
                 "equal to the number of available blendshapes. Currently " +
-                $"{this.morphWeights.Length} blendshapes ara available but {weights.Length} weights were passed.");
+                $"{m_morphWeights.Length} blendshapes ara available but {weights.Length} weights were passed.");
         }
 
         for (int i = 0; i < weights.Length; i++)
         {
-            this.morphWeights[i] = weights[i];
+            m_morphWeights[i] = weights[i];
         }
 
-        this.ApplyMorphs();
+        ApplyMorphs();
     }
 
     /// <summary>
-    /// Set weight for the blend shape with given index.
-    /// <br>
-    /// Default range is 0-100.
-    /// <br>
+    /// Set weight for the blend shape with given index.<br />
+    /// Default range is 0-100.<br />
     /// It is possible to apply negative weights or exceeding 100.
     /// </summary>
     /// <param name="index">Index of the blend shape</param>
     /// <param name="weight">Weight to be applied</param>
     public void SetBlendShapeWeight(int index, float weight)
     {
-        if (this.started == false)
+        if (Started == false)
         {
-            this.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(index, weight);
+            GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(index, weight);
             return;
         }
 
-        if (index < 0 || index >= this.morphWeights.Length)
+        if (index < 0 || index >= m_morphWeights.Length)
         {
             throw new IndexOutOfRangeException("Blend shape index out of range");
         }
 
-        this.morphWeights[index] = weight;
+        m_morphWeights[index] = weight;
 
-        this.ApplyMorphs();
+        ApplyMorphs();
     }
 
     /// <summary>
-    /// Returns currently applied weight for the blend shape with given index.
-    /// <br>
-    /// Default range is 0-100.
-    /// <br>
+    /// Returns currently applied weight for the blend shape with given index.<br />
+    /// Default range is 0-100.<br />
     /// It is possible to apply negative weights or exceeding 100.
     /// </summary>
     /// <param name="index">Index of the blend shape</param>
     /// <returns>Currently applied weight</returns>
     public float GetBlendShapeWeight(int index)
     {
-        if (this.started == false)
+        if (Started == false)
         {
-            return this.GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(index);
+            return GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(index);
         }
 
-        if (index < 0 || index >= this.morphWeights.Length)
+        if (index < 0 || index >= m_morphWeights.Length)
         {
             throw new IndexOutOfRangeException("Blend shape index out of range");
         }
 
-        return this.morphWeights[index];
+        return m_morphWeights[index];
     }
 
     /// <summary>
     /// UnityEngine.<a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh.html">Mesh</a> that is currently being rendered.
-    /// @see
-    /// <a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh.GetBlendShapeName.html">Mesh.GetBlendShapeName(int shapeIndex)</a>
-    /// @see
-    /// <a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh.GetBlendShapeIndex.html">Mesh.GetBlendShapeIndex(string blendShapeName)</a>
+    /// @see <a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh.GetBlendShapeName.html">Mesh.GetBlendShapeName(int shapeIndex)</a>
+    /// @see <a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh.GetBlendShapeIndex.html">Mesh.GetBlendShapeIndex(string blendShapeName)</a>
     /// @see <a class="bold" href="https://docs.unity3d.com/ScriptReference/Mesh-blendShapeCount.html">Mesh.blendShapeCount</a>
     /// </summary>
-    public Mesh mesh
+    public Mesh Mesh
     {
         get
         {
-            if (this.started == false)
+            if (Started == false)
             {
-                return this.smr.sharedMesh;
+                return SkinnedMeshRenderer.sharedMesh;
             }
 
-            return this.mf.sharedMesh;
+            return MeshFilter.sharedMesh;
         }
     }
 
@@ -335,35 +324,35 @@ public class DualQuaternionSkinner : MonoBehaviour
     /// </summary>
     public void UpdatePerVertexCompensationCoef()
     {
-        if (this.started == false)
+        if (Started == false)
         {
             return;
         }
 
-        var vertInfos = new VertexInfo[this.mf.sharedMesh.vertexCount];
-        this.bufVertInfo.GetData(vertInfos);
+        var vertInfos = new VertexInfo[MeshFilter.sharedMesh.vertexCount];
+        m_bufVertInfo.GetData(vertInfos);
 
         for (int i = 0; i < vertInfos.Length; i++)
         {
-            Matrix4x4  bindPose         = this.bindPoses[vertInfos[i].boneIndex0].inverse;
-            Quaternion boneBindRotation = bindPose.rotation;
-            Vector3 boneDirection
+            var bindPose         = m_bindPoses[vertInfos[i].boneIndex0].inverse;
+            var boneBindRotation = bindPose.rotation;
+            var boneDirection
                 = boneBindRotation *
-                  this.boneOrientationVector; // ToDo figure out bone orientation
-            Vector3 bonePosition = bindPose.GetPosition();
-            Vector3 toBone       = bonePosition - (Vector3)vertInfos[i].position;
+                  m_boneOrientationVector; // ToDo figure out bone orientation
+            var bonePosition = bindPose.GetPosition();
+            var toBone       = bonePosition - (Vector3)vertInfos[i].position;
 
             vertInfos[i].compensation_coef = Vector3.Cross(toBone, boneDirection).magnitude;
         }
 
-        this.bufVertInfo.SetData(vertInfos);
-        this.ApplyMorphs();
+        m_bufVertInfo.SetData(vertInfos);
+        ApplyMorphs();
     }
 
     private int GetVertexTextureHeight(int vertexCount, int textureWidth)
     {
-        int textureHeight = this.mf.sharedMesh.vertexCount / textureWidth;
-        if (this.mf.sharedMesh.vertexCount % textureWidth != 0)
+        int textureHeight = MeshFilter.sharedMesh.vertexCount / textureWidth;
+        if (MeshFilter.sharedMesh.vertexCount % textureWidth != 0)
         {
             textureHeight++;
         }
@@ -372,35 +361,35 @@ public class DualQuaternionSkinner : MonoBehaviour
 
     private void GrabMeshFromSkinnedMeshRenderer()
     {
-        this.ReleaseBuffers();
+        ReleaseBuffers();
 
-        this.mf.sharedMesh = this.smr.sharedMesh;
-        this.bindPoses     = this.mf.sharedMesh.bindposes;
+        MeshFilter.sharedMesh  = SkinnedMeshRenderer.sharedMesh;
+        m_bindPoses = MeshFilter.sharedMesh.bindposes;
 
-        this.arrBufMorphDeltas = new ComputeBuffer[this.mf.sharedMesh.blendShapeCount];
+        m_arrBufMorphDeltas = new ComputeBuffer[MeshFilter.sharedMesh.blendShapeCount];
 
-        this.morphWeights = new float[this.mf.sharedMesh.blendShapeCount];
+        m_morphWeights = new float[MeshFilter.sharedMesh.blendShapeCount];
 
-        var deltaVertices = new Vector3[this.mf.sharedMesh.vertexCount];
-        var deltaNormals  = new Vector3[this.mf.sharedMesh.vertexCount];
-        var deltaTangents = new Vector3[this.mf.sharedMesh.vertexCount];
+        var deltaVertices = new Vector3[MeshFilter.sharedMesh.vertexCount];
+        var deltaNormals  = new Vector3[MeshFilter.sharedMesh.vertexCount];
+        var deltaTangents = new Vector3[MeshFilter.sharedMesh.vertexCount];
 
-        var deltaVertInfos = new MorphDelta[this.mf.sharedMesh.vertexCount];
+        var deltaVertInfos = new MorphDelta[MeshFilter.sharedMesh.vertexCount];
 
-        for (int i = 0; i < this.mf.sharedMesh.blendShapeCount; i++)
+        for (int i = 0; i < MeshFilter.sharedMesh.blendShapeCount; i++)
         {
-            this.mf.sharedMesh.GetBlendShapeFrameVertices(
+            MeshFilter.sharedMesh.GetBlendShapeFrameVertices(
                 i,
                 0,
                 deltaVertices,
                 deltaNormals,
                 deltaTangents);
 
-            this.arrBufMorphDeltas[i] = new ComputeBuffer(
-                this.mf.sharedMesh.vertexCount,
+            m_arrBufMorphDeltas[i] = new ComputeBuffer(
+                MeshFilter.sharedMesh.vertexCount,
                 sizeof(float) * 12);
 
-            for (int k = 0; k < this.mf.sharedMesh.vertexCount; k++)
+            for (int k = 0; k < MeshFilter.sharedMesh.vertexCount; k++)
             {
                 deltaVertInfos[k].position
                     = deltaVertices != null ? deltaVertices[k] : Vector3.zero;
@@ -410,102 +399,102 @@ public class DualQuaternionSkinner : MonoBehaviour
                     = deltaTangents != null ? deltaTangents[k] : Vector3.zero;
             }
 
-            this.arrBufMorphDeltas[i].SetData(deltaVertInfos);
+            m_arrBufMorphDeltas[i].SetData(deltaVertInfos);
         }
 
-        Material[] materials = this.smr.sharedMaterials;
+        var materials = SkinnedMeshRenderer.sharedMaterials;
         for (int i = 0; i < materials.Length; i++)
         {
             materials[i].SetInt("_DoSkinning", 1);
         }
-        this.mr.materials = materials;
+        MeshRenderer.materials = materials;
 
-        this.shaderDQBlend.SetInt("textureWidth", textureWidth);
+        m_shaderDqBlend.SetInt("textureWidth", k_textureWidth);
 
-        this.poseMatrices = new Matrix4x4[this.mf.sharedMesh.bindposes.Length];
+        m_poseMatrices = new Matrix4x4[MeshFilter.sharedMesh.bindposes.Length];
 
         // initiate textures and buffers
 
-        int textureHeight = this.GetVertexTextureHeight(
-            this.mf.sharedMesh.vertexCount,
-            textureWidth);
+        int textureHeight = GetVertexTextureHeight(
+            MeshFilter.sharedMesh.vertexCount,
+            k_textureWidth);
 
-        this.rtSkinnedData_1
-            = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat)
+        m_rtSkinnedData1
+            = new RenderTexture(k_textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat)
             {
                 filterMode        = FilterMode.Point,
                 enableRandomWrite = true
             };
-        this.rtSkinnedData_1.Create();
-        this.shaderDQBlend.SetTexture(
-            this.kernelHandleDQBlend,
+        m_rtSkinnedData1.Create();
+        m_shaderDqBlend.SetTexture(
+            m_kernelHandleDqBlend,
             "skinned_data_1",
-            this.rtSkinnedData_1);
+            m_rtSkinnedData1);
 
-        this.rtSkinnedData_2
-            = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat)
+        m_rtSkinnedData2
+            = new RenderTexture(k_textureWidth, textureHeight, 0, RenderTextureFormat.ARGBFloat)
             {
                 filterMode        = FilterMode.Point,
                 enableRandomWrite = true
             };
-        this.rtSkinnedData_2.Create();
-        this.shaderDQBlend.SetTexture(
-            this.kernelHandleDQBlend,
+        m_rtSkinnedData2.Create();
+        m_shaderDqBlend.SetTexture(
+            m_kernelHandleDqBlend,
             "skinned_data_2",
-            this.rtSkinnedData_2);
+            m_rtSkinnedData2);
 
-        this.rtSkinnedData_3
-            = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.RGFloat)
+        m_rtSkinnedData3
+            = new RenderTexture(k_textureWidth, textureHeight, 0, RenderTextureFormat.RGFloat)
             {
                 filterMode        = FilterMode.Point,
                 enableRandomWrite = true
             };
-        this.rtSkinnedData_3.Create();
-        this.shaderDQBlend.SetTexture(
-            this.kernelHandleDQBlend,
+        m_rtSkinnedData3.Create();
+        m_shaderDqBlend.SetTexture(
+            m_kernelHandleDqBlend,
             "skinned_data_3",
-            this.rtSkinnedData_3);
+            m_rtSkinnedData3);
 
-        this.bufPoseMatrices = new ComputeBuffer(
-            this.mf.sharedMesh.bindposes.Length,
+        m_bufPoseMatrices = new ComputeBuffer(
+            MeshFilter.sharedMesh.bindposes.Length,
             sizeof(float) * 16);
-        this.shaderComputeBoneDQ.SetBuffer(
-            this.kernelHandleComputeBoneDQ,
+        m_shaderComputeBoneDq.SetBuffer(
+            m_kernelHandleComputeBoneDq,
             "pose_matrices",
-            this.bufPoseMatrices);
+            m_bufPoseMatrices);
 
-        this.bufSkinnedDq = new ComputeBuffer(
-            this.mf.sharedMesh.bindposes.Length,
+        m_bufSkinnedDq = new ComputeBuffer(
+            MeshFilter.sharedMesh.bindposes.Length,
             sizeof(float) * 8);
-        this.shaderComputeBoneDQ.SetBuffer(
-            this.kernelHandleComputeBoneDQ,
+        m_shaderComputeBoneDq.SetBuffer(
+            m_kernelHandleComputeBoneDq,
             "skinned_dual_quaternions",
-            this.bufSkinnedDq);
-        this.shaderDQBlend.SetBuffer(
-            this.kernelHandleDQBlend,
+            m_bufSkinnedDq);
+        m_shaderDqBlend.SetBuffer(
+            m_kernelHandleDqBlend,
             "skinned_dual_quaternions",
-            this.bufSkinnedDq);
+            m_bufSkinnedDq);
 
-        this.bufBoneDirections = new ComputeBuffer(
-            this.mf.sharedMesh.bindposes.Length,
+        m_bufBoneDirections = new ComputeBuffer(
+            MeshFilter.sharedMesh.bindposes.Length,
             sizeof(float) * 4);
-        this.shaderComputeBoneDQ.SetBuffer(
-            this.kernelHandleComputeBoneDQ,
+        m_shaderComputeBoneDq.SetBuffer(
+            m_kernelHandleComputeBoneDq,
             "bone_directions",
-            this.bufBoneDirections);
-        this.shaderDQBlend.SetBuffer(
-            this.kernelHandleDQBlend,
+            m_bufBoneDirections);
+        m_shaderDqBlend.SetBuffer(
+            m_kernelHandleDqBlend,
             "bone_directions",
-            this.bufBoneDirections);
+            m_bufBoneDirections);
 
-        this.bufVertInfo = new ComputeBuffer(
-            this.mf.sharedMesh.vertexCount,
+        m_bufVertInfo = new ComputeBuffer(
+            MeshFilter.sharedMesh.vertexCount,
             (sizeof(float) * 16) + (sizeof(int) * 4) + sizeof(float));
-        var          vertInfos   = new VertexInfo[this.mf.sharedMesh.vertexCount];
-        Vector3[]    vertices    = this.mf.sharedMesh.vertices;
-        Vector3[]    normals     = this.mf.sharedMesh.normals;
-        Vector4[]    tangents    = this.mf.sharedMesh.tangents;
-        BoneWeight[] boneWeights = this.mf.sharedMesh.boneWeights;
+        var vertInfos   = new VertexInfo[MeshFilter.sharedMesh.vertexCount];
+        var vertices    = MeshFilter.sharedMesh.vertices;
+        var normals     = MeshFilter.sharedMesh.normals;
+        var tangents    = MeshFilter.sharedMesh.tangents;
+        var boneWeights = MeshFilter.sharedMesh.boneWeights;
         for (int i = 0; i < vertInfos.Length; i++)
         {
             vertInfos[i].position = vertices[i];
@@ -522,13 +511,13 @@ public class DualQuaternionSkinner : MonoBehaviour
 
             // determine per-vertex compensation coef
 
-            Matrix4x4  bindPose         = this.bindPoses[vertInfos[i].boneIndex0].inverse;
-            Quaternion boneBindRotation = bindPose.rotation;
-            Vector3 boneDirection
+            var  bindPose         = m_bindPoses[vertInfos[i].boneIndex0].inverse;
+            var boneBindRotation = bindPose.rotation;
+            var boneDirection
                 = boneBindRotation *
-                  this.boneOrientationVector; // ToDo figure out bone orientation
-            Vector3 bonePosition = bindPose.GetPosition();
-            Vector3 toBone       = bonePosition - (Vector3)vertInfos[i].position;
+                  m_boneOrientationVector; // ToDo figure out bone orientation
+            var bonePosition = bindPose.GetPosition();
+            var toBone       = bonePosition - (Vector3)vertInfos[i].position;
 
             vertInfos[i].compensation_coef = Vector3.Cross(toBone, boneDirection).magnitude;
         }
@@ -549,51 +538,51 @@ public class DualQuaternionSkinner : MonoBehaviour
             }
         }
 
-        this.bufVertInfo.SetData(vertInfos);
-        this.shaderDQBlend.SetBuffer(
-            this.kernelHandleDQBlend,
+        m_bufVertInfo.SetData(vertInfos);
+        m_shaderDqBlend.SetBuffer(
+            m_kernelHandleDqBlend,
             "vertex_infos",
-            this.bufVertInfo);
+            m_bufVertInfo);
 
-        this.bufMorphTemp_1 = new ComputeBuffer(
-            this.mf.sharedMesh.vertexCount,
+        m_bufMorphTemp1 = new ComputeBuffer(
+            MeshFilter.sharedMesh.vertexCount,
             (sizeof(float) * 16) + (sizeof(int) * 4) + sizeof(float));
-        this.bufMorphTemp_2 = new ComputeBuffer(
-            this.mf.sharedMesh.vertexCount,
+        m_bufMorphTemp2 = new ComputeBuffer(
+            MeshFilter.sharedMesh.vertexCount,
             (sizeof(float) * 16) + (sizeof(int) * 4) + sizeof(float));
 
         // bind DQ buffer
 
-        Matrix4x4[] bindPoses = this.mf.sharedMesh.bindposes;
-        var         bindDqs   = new DualQuaternion[bindPoses.Length];
+        var bindPoses = MeshFilter.sharedMesh.bindposes;
+        var bindDqs   = new DualQuaternion[bindPoses.Length];
         for (int i = 0; i < bindPoses.Length; i++)
         {
             bindDqs[i].rotationQuaternion = bindPoses[i].rotation;
             bindDqs[i].position           = bindPoses[i].GetPosition();
         }
 
-        this.bufBindDq = new ComputeBuffer(bindDqs.Length, sizeof(float) * 8);
-        this.bufBindDq.SetData(bindDqs);
-        this.shaderComputeBoneDQ.SetBuffer(
-            this.kernelHandleComputeBoneDQ,
+        m_bufBindDq = new ComputeBuffer(bindDqs.Length, sizeof(float) * 8);
+        m_bufBindDq.SetData(bindDqs);
+        m_shaderComputeBoneDq.SetBuffer(
+            m_kernelHandleComputeBoneDq,
             "bind_dual_quaternions",
-            this.bufBindDq);
+            m_bufBindDq);
 
-        this.UpdateViewFrustrumCulling();
-        this.ApplyMorphs();
+        UpdateViewFrustumCulling();
+        ApplyMorphs();
     }
 
     private void ApplyMorphs()
     {
-        ComputeBuffer bufMorphedVertexInfos = this.GetMorphedVertexInfos(
-            this.bufVertInfo,
-            ref this.bufMorphTemp_1,
-            ref this.bufMorphTemp_2,
-            this.arrBufMorphDeltas,
-            this.morphWeights);
+        var bufMorphedVertexInfos = GetMorphedVertexInfos(
+            m_bufVertInfo,
+            ref m_bufMorphTemp1,
+            ref m_bufMorphTemp2,
+            m_arrBufMorphDeltas,
+            m_morphWeights);
 
-        this.shaderDQBlend.SetBuffer(
-            this.kernelHandleDQBlend,
+        m_shaderDqBlend.SetBuffer(
+            m_kernelHandleDqBlend,
             "vertex_infos",
             bufMorphedVertexInfos);
     }
@@ -605,7 +594,7 @@ public class DualQuaternionSkinner : MonoBehaviour
         ComputeBuffer[]   arrBufDelta,
         float[]           weights)
     {
-        ComputeBuffer bufSource = bufOriginal;
+        var bufSource = bufOriginal;
 
         for (int i = 0; i < weights.Length; i++)
         {
@@ -619,21 +608,21 @@ public class DualQuaternionSkinner : MonoBehaviour
                 throw new NullReferenceException();
             }
 
-            this.shaderApplyMorph.SetBuffer(this.kernelHandleApplyMorph, "source", bufSource);
-            this.shaderApplyMorph.SetBuffer(this.kernelHandleApplyMorph, "target", bufTemp_1);
-            this.shaderApplyMorph.SetBuffer(
-                this.kernelHandleApplyMorph,
+            m_shaderApplyMorph.SetBuffer(m_kernelHandleApplyMorph, "source", bufSource);
+            m_shaderApplyMorph.SetBuffer(m_kernelHandleApplyMorph, "target", bufTemp_1);
+            m_shaderApplyMorph.SetBuffer(
+                m_kernelHandleApplyMorph,
                 "delta",
                 arrBufDelta[i]);
-            this.shaderApplyMorph.SetFloat("weight", weights[i] / 100f);
+            m_shaderApplyMorph.SetFloat("weight", weights[i] / 100f);
 
-            int numThreadGroups = bufSource.count / numthreads;
-            if (bufSource.count % numthreads != 0)
+            int numThreadGroups = bufSource.count / k_numthreads;
+            if (bufSource.count % k_numthreads != 0)
             {
                 numThreadGroups++;
             }
 
-            this.shaderApplyMorph.Dispatch(this.kernelHandleApplyMorph, numThreadGroups, 1, 1);
+            m_shaderApplyMorph.Dispatch(m_kernelHandleApplyMorph, numThreadGroups, 1, 1);
 
             bufSource = bufTemp_1;
             bufTemp_1 = bufTemp_2;
@@ -645,103 +634,103 @@ public class DualQuaternionSkinner : MonoBehaviour
 
     private void ReleaseBuffers()
     {
-        this.bufBindDq?.Release();
-        this.bufPoseMatrices?.Release();
-        this.bufSkinnedDq?.Release();
+        m_bufBindDq?.Release();
+        m_bufPoseMatrices?.Release();
+        m_bufSkinnedDq?.Release();
 
-        this.bufVertInfo?.Release();
-        this.bufMorphTemp_1?.Release();
-        this.bufMorphTemp_2?.Release();
+        m_bufVertInfo?.Release();
+        m_bufMorphTemp1?.Release();
+        m_bufMorphTemp2?.Release();
 
-        this.bufBoneDirections?.Release();
+        m_bufBoneDirections?.Release();
 
-        if (this.arrBufMorphDeltas != null)
+        if (m_arrBufMorphDeltas != null)
         {
-            for (int i = 0; i < this.arrBufMorphDeltas.Length; i++)
+            for (int i = 0; i < m_arrBufMorphDeltas.Length; i++)
             {
-                this.arrBufMorphDeltas[i]?.Release();
+                m_arrBufMorphDeltas[i]?.Release();
             }
         }
     }
 
     private void OnDestroy()
     {
-        this.ReleaseBuffers();
+        ReleaseBuffers();
     }
 
     // Use this for initialization
     private void Start()
     {
-        this.materialPropertyBlock = new MaterialPropertyBlock();
+        m_materialPropertyBlock = new MaterialPropertyBlock();
 
-        this.shaderComputeBoneDQ = Instantiate(this.shaderComputeBoneDQ); // bug workaround
-        this.shaderDQBlend       = Instantiate(this.shaderDQBlend);       // bug workaround
-        this.shaderApplyMorph    = Instantiate(this.shaderApplyMorph);    // bug workaround
+        m_shaderComputeBoneDq = Instantiate(m_shaderComputeBoneDq); // bug workaround
+        m_shaderDqBlend       = Instantiate(m_shaderDqBlend);       // bug workaround
+        m_shaderApplyMorph    = Instantiate(m_shaderApplyMorph);    // bug workaround
 
-        this.kernelHandleComputeBoneDQ = this.shaderComputeBoneDQ.FindKernel("CSMain");
-        this.kernelHandleDQBlend       = this.shaderDQBlend.FindKernel("CSMain");
-        this.kernelHandleApplyMorph    = this.shaderApplyMorph.FindKernel("CSMain");
+        m_kernelHandleComputeBoneDq = m_shaderComputeBoneDq.FindKernel("CSMain");
+        m_kernelHandleDqBlend       = m_shaderDqBlend.FindKernel("CSMain");
+        m_kernelHandleApplyMorph    = m_shaderApplyMorph.FindKernel("CSMain");
 
-        this.bones = this.smr.bones;
+        m_bones = SkinnedMeshRenderer.bones;
 
-        this.started = true;
-        this.GrabMeshFromSkinnedMeshRenderer();
+        Started = true;
+        GrabMeshFromSkinnedMeshRenderer();
 
-        for (int i = 0; i < this.morphWeights.Length; i++)
+        for (int i = 0; i < m_morphWeights.Length; i++)
         {
-            this.morphWeights[i] = this.smr.GetBlendShapeWeight(i);
+            m_morphWeights[i] = SkinnedMeshRenderer.GetBlendShapeWeight(i);
         }
 
-        this.smr.enabled = false;
+        SkinnedMeshRenderer.enabled = false;
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if (this.mr.isVisible == false)
+        if (MeshRenderer.isVisible == false)
         {
             return;
         }
 
-        this.mf.sharedMesh.MarkDynamic(); // once or every frame? idk.
+        MeshFilter.sharedMesh.MarkDynamic(); // once or every frame? idk.
         // at least it does not affect performance
 
-        for (int i = 0; i < this.bones.Length; i++)
+        for (int i = 0; i < m_bones.Length; i++)
         {
-            this.poseMatrices[i] = this.bones[i].localToWorldMatrix;
+            m_poseMatrices[i] = m_bones[i].localToWorldMatrix;
         }
 
-        this.bufPoseMatrices.SetData(this.poseMatrices);
+        m_bufPoseMatrices.SetData(m_poseMatrices);
 
         // Calculate blended quaternions
 
-        int numThreadGroups = this.bones.Length / numthreads;
-        numThreadGroups += this.bones.Length % numthreads == 0 ? 0 : 1;
+        int numThreadGroups = m_bones.Length / k_numthreads;
+        numThreadGroups += m_bones.Length % k_numthreads == 0 ? 0 : 1;
 
-        this.shaderComputeBoneDQ.SetVector("boneOrientation", this.boneOrientationVector);
-        this.shaderComputeBoneDQ.SetMatrix(
+        m_shaderComputeBoneDq.SetVector("boneOrientation", m_boneOrientationVector);
+        m_shaderComputeBoneDq.SetMatrix(
             "self_matrix",
-            this.transform.worldToLocalMatrix);
-        this.shaderComputeBoneDQ.Dispatch(
-            this.kernelHandleComputeBoneDQ,
+            transform.worldToLocalMatrix);
+        m_shaderComputeBoneDq.Dispatch(
+            m_kernelHandleComputeBoneDq,
             numThreadGroups,
             1,
             1);
 
-        numThreadGroups =  this.mf.sharedMesh.vertexCount / numthreads;
-        numThreadGroups += this.mf.sharedMesh.vertexCount % numthreads == 0 ? 0 : 1;
+        numThreadGroups =  MeshFilter.sharedMesh.vertexCount / k_numthreads;
+        numThreadGroups += MeshFilter.sharedMesh.vertexCount % k_numthreads == 0 ? 0 : 1;
 
-        this.shaderDQBlend.SetFloat("compensation_coef", this.bulgeCompensation);
-        this.shaderDQBlend.Dispatch(this.kernelHandleDQBlend, numThreadGroups, 1, 1);
+        m_shaderDqBlend.SetFloat("compensation_coef", m_bulgeCompensation);
+        m_shaderDqBlend.Dispatch(m_kernelHandleDqBlend, numThreadGroups, 1, 1);
 
-        this.materialPropertyBlock.SetTexture("skinned_data_1", this.rtSkinnedData_1);
-        this.materialPropertyBlock.SetTexture("skinned_data_2", this.rtSkinnedData_2);
-        this.materialPropertyBlock.SetTexture("skinned_data_3", this.rtSkinnedData_3);
-        this.materialPropertyBlock.SetInt(
+        m_materialPropertyBlock.SetTexture("skinned_data_1", m_rtSkinnedData1);
+        m_materialPropertyBlock.SetTexture("skinned_data_2", m_rtSkinnedData2);
+        m_materialPropertyBlock.SetTexture("skinned_data_3", m_rtSkinnedData3);
+        m_materialPropertyBlock.SetInt(
             "skinned_tex_height",
-            this.GetVertexTextureHeight(this.mf.sharedMesh.vertexCount, textureWidth));
-        this.materialPropertyBlock.SetInt("skinned_tex_width", textureWidth);
+            GetVertexTextureHeight(MeshFilter.sharedMesh.vertexCount, k_textureWidth));
+        m_materialPropertyBlock.SetInt("skinned_tex_width", k_textureWidth);
 
-        this.mr.SetPropertyBlock(this.materialPropertyBlock);
+        MeshRenderer.SetPropertyBlock(m_materialPropertyBlock);
     }
 }

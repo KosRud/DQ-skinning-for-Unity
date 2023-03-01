@@ -18,27 +18,27 @@ float4 QuaternionMultiply(float4 q1, float4 q2)
     return q1;
 }
 
-struct dual_quaternion DualQuaternionMultiply(struct dual_quaternion dq1, struct dual_quaternion dq2)
+dual_quaternion DualQuaternionMultiply(dual_quaternion dq1, dual_quaternion dq2)
 {
-    struct dual_quaternion result;
+    dual_quaternion result;
 
-    result.translation_quaternion = QuaternionMultiply(dq1.rotation_quaternion,		dq2.translation_quaternion) + 
-                                    QuaternionMultiply(dq1.translation_quaternion,	dq2.rotation_quaternion);
+    result.translation_quaternion = QuaternionMultiply(dq1.rotation_quaternion,    dq2.translation_quaternion) + 
+                                    QuaternionMultiply(dq1.translation_quaternion, dq2.rotation_quaternion);
     
     result.rotation_quaternion = QuaternionMultiply(dq1.rotation_quaternion, dq2.rotation_quaternion);
 
-    float mag = length(result.rotation_quaternion);
+    const float mag = length(result.rotation_quaternion);
     result.rotation_quaternion /= mag;
     result.translation_quaternion /= mag;
 
     return result;
 }
 
-struct dual_quaternion DualQuaternionShortestPath(struct dual_quaternion dq1, struct dual_quaternion dq2)
+dual_quaternion DualQuaternionShortestPath(dual_quaternion dq1, dual_quaternion dq2)
 {
-    bool isBadPath = dot(dq1.rotation_quaternion, dq2.rotation_quaternion) < 0;
-    dq1.rotation_quaternion		= isBadPath ? -dq1.rotation_quaternion		: dq1.rotation_quaternion;
-    dq1.translation_quaternion	= isBadPath ? -dq1.translation_quaternion	: dq1.translation_quaternion;
+    const bool isBadPath = dot(dq1.rotation_quaternion, dq2.rotation_quaternion) < 0;
+    dq1.rotation_quaternion    = isBadPath ? -dq1.rotation_quaternion    : dq1.rotation_quaternion;
+    dq1.translation_quaternion = isBadPath ? -dq1.translation_quaternion : dq1.translation_quaternion;
     return dq1;
 }
 
@@ -50,15 +50,15 @@ float4 QuaternionApplyRotation(float4 v, float4 rotQ)
 
 inline float signNoZero(float x)
 {
-    float s = sign(x);
+    const float s = sign(x);
     if (s)
         return s;
     return 1;
 }
 
-struct dual_quaternion DualQuaternionFromMatrix4x4(float4x4 m)
+dual_quaternion DualQuaternionFromMatrix4x4(float4x4 m)
 {
-    struct  dual_quaternion dq;
+    dual_quaternion dq;
 
     // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
     // Alternative Method by Christian
