@@ -92,7 +92,7 @@ Works **A LOT** faster with IL2CPP, about 30% slower than built-in skinning in w
 
 ## API
 
-[Documentation](https://constantinerudenko.github.io/DQ-skinning-for-Unity/hierarchy.html)
+[Documentation](https://kosrud.github.io/DQ-skinning-for-Unity/hierarchy.html)
 
 ## Future plans
 
